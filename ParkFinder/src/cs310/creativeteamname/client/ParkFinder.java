@@ -1,5 +1,10 @@
 package cs310.creativeteamname.client;
 
+import com.google.maps.gwt.client.MapOptions;
+import com.google.maps.gwt.client.LatLng;
+import com.google.maps.gwt.client.MapTypeId;
+import com.google.maps.gwt.client.GoogleMap;
+
 import cs310.creativeteamname.shared.FieldVerifier;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
