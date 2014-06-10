@@ -1,19 +1,30 @@
 package cs310.creativeteamname.client;
 
 import cs310.creativeteamname.shared.FieldVerifier;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Node;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+
+import com.google.gwt.maps.client.control.LargeMapControl;
+import com.google.gwt.maps.client.geom.LatLng;
+import com.google.gwt.maps.client.InfoWindowContent;
+import com.google.gwt.maps.client.MapWidget;
+import com.google.gwt.maps.client.Maps;
+import com.google.gwt.maps.client.overlay.Marker;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -149,5 +160,17 @@ public class ParkFinder implements EntryPoint {
 		MyHandler handler = new MyHandler();
 		sendButton.addClickHandler(handler);
 		nameField.addKeyUpHandler(handler);
+		
+		//  Map testing
+		LatLng vancouver = LatLng.newInstance(49.246756, -123.112569);
+		
+		final MapWidget map = new MapWidget(vancouver, 2);
+		map.setSize("100%", "100%");
+		map.addControl(new LargeMapControl());
+		map.addOverlay(new Marker(vancouver));
+		map.getInfoWindow().open(map.getCenter(), new InfoWindowContent("This is the city in which you live."));
+		final DockLayoutPanel dock = new DockLayoutPanel(Unit.PX);
+		dock.addNorth(map,  500);
+		RootPanel.get("maptest").add(dock);
 	}
 }
