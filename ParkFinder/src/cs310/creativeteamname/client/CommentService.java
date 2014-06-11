@@ -5,5 +5,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("comment")
 public interface CommentService extends RemoteService{
+	public void addComment(String symbol);
+	public String[] displayComment();
 	
 }
