@@ -18,7 +18,7 @@
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
 
   <!-- Google Maps API v3 -->
-  <inherits name="com.google.gwt.maps.GoogleMaps" />
+  <inherits name="" />
 
   <!-- Specify the app entry point class.                         -->
   <entry-point class='cs310.creativeteamname.client.ParkFinder'/>
