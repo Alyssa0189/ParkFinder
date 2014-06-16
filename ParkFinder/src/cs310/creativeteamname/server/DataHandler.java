@@ -6,21 +6,24 @@ import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import cs310.creativeteamname.shared.Park;
 import cs310.creativeteamname.shared.XmlConstants;
-import model.*;
+
 /**
  * This code is styled after the lab solution for CS210 SAX parsing lab.
  * @author Dan
  *
  */
 public class DataHandler extends DefaultHandler{
+	
 	StringBuffer accumulator;
 	List<Park> parkLocations;
 	Park currentPark;
+	TemporaryImageHack hack = new TemporaryImageHack();
 //	Washroom currentWashroom = new Washroom();
 //	Facility currentFacility = new Facility();
 	public List<Park> getParkLocations(){
@@ -44,6 +47,7 @@ public class DataHandler extends DefaultHandler{
 			try{
 				int id = Integer.parseInt(atts.getValue(XmlConstants.PARK_ID));
 				currentPark.setParkId(id);
+				currentPark.setImageUrl(hack.getImage(id));
 			}catch(NumberFormatException nfe){
 				// do nothing
 			}
@@ -151,6 +155,7 @@ public class DataHandler extends DefaultHandler{
 			break;
 		
 		}
+		
 	}
 }
 

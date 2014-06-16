@@ -25,6 +25,7 @@ public class Park implements Serializable {
     private List<String> facilities;
     private List<String> specialFeatures;
     private boolean isWashroom;
+    private String imageUrl;
 
 	public Park() {
 		facilities = new LinkedList<String>();
@@ -159,4 +160,10 @@ public class Park implements Serializable {
 		this.isWashroom = isWashroom;
 	}
 
+	public String getImageUrl(){
+		return imageUrl;
+	}
+	public void setImageUrl(String imageUrl){
+		this.imageUrl = imageUrl;
+	}
 }
