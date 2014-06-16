@@ -9,12 +9,7 @@ import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.xml.sax.Attributes;
-import org.xml.sax.helpers.DefaultHandler;
-
-import cs310.creativeteamname.shared.Facility;
 import cs310.creativeteamname.shared.Park;
-import cs310.creativeteamname.shared.Washroom;
 import cs310.creativeteamname.shared.XmlConstants;
 import model.*;
 /**
@@ -26,8 +21,8 @@ public class DataHandler extends DefaultHandler{
 	StringBuffer accumulator;
 	List<Park> parkLocations;
 	Park currentPark;
-	Washroom currentWashroom = new Washroom();
-	Facility currentFacility = new Facility();
+//	Washroom currentWashroom = new Washroom();
+//	Facility currentFacility = new Facility();
 	public List<Park> getParkLocations(){
 		return parkLocations;
 	}
@@ -127,41 +122,32 @@ public class DataHandler extends DefaultHandler{
 		case XmlConstants.FACILITIES:
 			break;
 		case XmlConstants.FACILITY:
-			currentPark.addFacility(currentFacility);
-			currentFacility = new Facility();
+			// do nothing - this field is not used
 			break;
 		case XmlConstants.FACILITY_COUNT:
-			try{
-				int c = Integer.parseInt(accumulator.toString());
-				currentFacility.setFacilityCount(c);
-			}catch(NumberFormatException nfe){
-				System.out.println("cannot parse facility count");
-			}
-			
+			// do nothing - this field is not used
 			break;
 		case XmlConstants.FACILITY_TYPE:
-			currentFacility.setFacilityType(accumulator.toString());
+			currentPark.addFacility(accumulator.toString());
 			break;
 		case XmlConstants.FACILITY_URL:
-			currentFacility.setFacilityURL(accumulator.toString());
+			// do nothing - this field is not used
 			break;
 		case XmlConstants.WASHROOM:
-			if(currentWashroom.getLocation() != null){
-				currentPark.addWashroom(currentWashroom);
-				currentWashroom = new Washroom();
-			}
+			// do nothing - presence of this element does not guarantee presence of washroom
+			// must check for presence of inner elements.
 			break;
 		case XmlConstants.WASHROOM_LOCATION:
-			currentWashroom.setLocation(accumulator.toString());
+			currentPark.setWashroom(true);
 			break;
 		case XmlConstants.WASHROOM_NOTES:
-			currentWashroom.setNotes(accumulator.toString());
+			currentPark.setWashroom(true);
 			break;
 		case XmlConstants.WASHROOM_WINTER_HOURS:
-			currentWashroom.setWinterHours(accumulator.toString());
+			currentPark.setWashroom(true);
 			break;
 		case XmlConstants.WASHROOM_SUMMER_HOURS:
-			currentWashroom.setSummerHours(accumulator.toString());
+			currentPark.setWashroom(true);
 			break;
 		
 		}

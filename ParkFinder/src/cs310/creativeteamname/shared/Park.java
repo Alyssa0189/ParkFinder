@@ -29,6 +29,7 @@ public class Park implements Serializable {
 	public Park() {
 		facilities = new LinkedList<String>();
 		specialFeatures = new LinkedList<String>();
+		isWashroom = false;
 	}
     
 	public int getParkId() {
@@ -135,12 +136,19 @@ public class Park implements Serializable {
 		this.facilities = facilities;
 	}
 
+	public void addFacility(String facility){
+		facilities.add(facility);
+	}
 	public List<String> getSpecialFeatures() {
 		return specialFeatures;
 	}
 
 	public void setSpecialFeatures(List<String> specialFeatures) {
 		this.specialFeatures = specialFeatures;
+	}
+	
+	public void addSpecialFeature(String specialFeature){
+		specialFeatures.add(specialFeature);
 	}
 
 	public boolean isWashroom() {
