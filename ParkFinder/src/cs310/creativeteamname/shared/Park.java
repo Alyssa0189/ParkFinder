@@ -1,9 +1,10 @@
-package model;
+package cs310.creativeteamname.shared;
 
 import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
-
+import javax.jdo.annotations.PersistenceCapable;
+@PersistenceCapable
 public class Park {
 	public Park(){
 		washrooms = new LinkedList<Washroom>();

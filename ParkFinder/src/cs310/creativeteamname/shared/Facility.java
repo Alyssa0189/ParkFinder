@@ -1,5 +1,6 @@
-package model;
-
+package cs310.creativeteamname.shared;
+import javax.jdo.annotations.PersistenceCapable;
+@PersistenceCapable
 public class Facility {
 
     private int facilityCount;

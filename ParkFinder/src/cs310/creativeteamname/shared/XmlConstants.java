@@ -1,5 +1,4 @@
-package model;
-
+package cs310.creativeteamname.shared;
 public class XmlConstants {
 	private XmlConstants(){} // private constructor - static file
 	public static final String PARKS = "COVParksFacilities";
