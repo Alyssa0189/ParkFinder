@@ -6,6 +6,7 @@
          xmlns="http://java.sun.com/xml/ns/javaee">
 
   <!-- Servlets -->
+  
   <servlet>
     <servlet-name>dataVancouverService</servlet-name>
     <servlet-class>cs310.creativeteamname.server.DataVancouverServiceImpl</servlet-class>
@@ -16,7 +17,7 @@
     <url-pattern>/parkfinder/data</url-pattern>
   </servlet-mapping>
   
-    <servlet>
+  <servlet>
     <servlet-name>commentService</servlet-name>
     <servlet-class>cs310.creativeteamname.server.CommentServiceImpl</servlet-class>
   </servlet>
@@ -26,7 +27,7 @@
     <url-pattern>/parkfinder/comment</url-pattern>
   </servlet-mapping>
   
-    <servlet>
+  <servlet>
     <servlet-name>facebookService</servlet-name>
     <servlet-class>cs310.creativeteamname.server.FacebookServiceImpl</servlet-class>
   </servlet>
@@ -36,7 +37,7 @@
     <url-pattern>/parkfinder/facebook</url-pattern>
   </servlet-mapping>
   
-    <servlet>
+  <servlet>
     <servlet-name>googleMapService</servlet-name>
     <servlet-class>cs310.creativeteamname.server.GoogleMapServiceImpl</servlet-class>
   </servlet>
@@ -46,17 +47,7 @@
     <url-pattern>/parkfinder/map</url-pattern>
   </servlet-mapping>
   
-    <servlet>
-    <servlet-name>greetingService</servlet-name>
-    <servlet-class>cs310.creativeteamname.server.GreetingServiceImpl</servlet-class>
-  </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>greetingService</servlet-name>
-    <url-pattern>/parkfinder/greet</url-pattern>
-  </servlet-mapping>
-  
-    <servlet>
+  <servlet>
     <servlet-name>locationService</servlet-name>
     <servlet-class>cs310.creativeteamname.server.LocationServiceImpl</servlet-class>
   </servlet>
@@ -66,7 +57,7 @@
     <url-pattern>/parkfinder/location</url-pattern>
   </servlet-mapping>
   
-    <servlet>
+  <servlet>
     <servlet-name>loginService</servlet-name>
     <servlet-class>cs310.creativeteamname.server.LoginServiceImpl</servlet-class>
   </servlet>
