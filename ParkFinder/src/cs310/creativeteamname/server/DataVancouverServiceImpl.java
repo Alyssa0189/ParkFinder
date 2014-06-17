@@ -10,6 +10,8 @@ import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 
+import org.datanucleus.Transaction;
+
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import cs310.creativeteamname.client.DataVancouverService;
@@ -43,9 +45,13 @@ public class DataVancouverServiceImpl extends RemoteServiceServlet implements Da
 		return stream;
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void save(HashMap<Integer, Park> parks){
 		PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory();
 		PersistenceManager pm = pmf.getPersistenceManager();
+		javax.jdo.Transaction transaction = pm.currentTransaction();
+		transaction.begin();
 		pm.makePersistentAll(parks);
+		transaction.commit();
 	}
 }
