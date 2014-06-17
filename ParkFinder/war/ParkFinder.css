@@ -1,5 +1,32 @@
 /** Add css rules here for your application. */
 
+body {
+  text-align: center;
+}
+
+/* details panel */
+.detailsPanel {
+  border-spacing: 6px;
+  width: 600px;
+}
+
+/* details label */
+.detailsLabel {
+  background-color: #567E3A;
+  color: white;
+  font-size: 16px;
+  text-align: center;
+}
+
+/* details flex table */
+.detailsTable {
+  width: 600px;
+}
+
+/* details column */
+.detailsColumns {
+  width: 150px;
+}
 
 /** Example rules used by the template application (remove for your app) */
 h1 {

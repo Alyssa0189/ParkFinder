@@ -1,6 +1,7 @@
 package cs310.creativeteamname.client;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.shared.GWT;
@@ -10,69 +11,155 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.maps.client.InfoWindowContent;
-import com.google.gwt.maps.client.MapWidget;
-import com.google.gwt.maps.client.control.LargeMapControl;
-import com.google.gwt.maps.client.geom.LatLng;
-import com.google.gwt.maps.client.overlay.Marker;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
-import com.google.gwt.user.client.ui.RootLayoutPanel;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Button;
+
+import cs310.creativeteamname.shared.Park;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class ParkFinder implements EntryPoint {
-
+	
 	private VerticalPanel detailsPanel = new VerticalPanel();
+	private Label detailsLabel = new Label("Park Details");
+	private Image detailsImage = new Image();
+	private FlexTable detailsFlexTable = new FlexTable();
+	private Label commentsLabel = new Label("Comments");
+	private FlexTable commentFlexTable = new FlexTable();
+	private Button addNewCommentButton = new Button("Add your comment");
+	private DetailsServiceAsync detailsService = GWT.create(DetailsService.class);	
+
 	private VerticalPanel commentPanel = new VerticalPanel();
 	private TextArea commentInputArea = new TextArea();
 	private Label commentHereLabel = new Label(
 			"Please add your comment in the textbox below (maximum character allowed: 250)");
-	private Button addCommentButton = new Button("Add your comment");
 	private Button submitButton = new Button("Submit");
 	private Button cancelButton = new Button("Cancel");
 	private ArrayList<String> comments = new ArrayList<String>(); 
 	private final CommentServiceAsync commentService = GWT
 			.create(CommentService.class);
-	private FlexTable commentFlexTable = new FlexTable();
 
 	private static final int CHARACTER_LIMIT=250;
 
 	/**
 	 * This is the entry point method.
-	 */
-
+	 */	
 	public void onModuleLoad() {
-
-		
-
-		// Assemble Main panel
-		detailsPanel.add(addCommentButton);
-		detailsPanel.add(commentFlexTable);
-		RootPanel.get("detailPage").add(detailsPanel);
-
-		// ToDoList
-		// the comments from field should be displayed
-		
-		// when addComment button is pressed leads to comment page
-
 		loadCommentPanel();
+		
 	// Map testing
 		MapMaker maker = MapMaker.getInstance();
 		MapWidget map = maker.getParkMap();	
 		final DockLayoutPanel dock = new DockLayoutPanel(Unit.PX);
 		dock.addNorth(map, 500);
 		RootPanel.get("maptest").add(dock);
+
+//		loadDetailsPanel("test");
+	}
+	
+	/** 
+	 * Load the park details panel.
+	 * 
+	 * @param parkId the park's id.
+	 */
+	private void loadDetailsPanel(String parkId) {
+		// Create table for park details.
+		detailsFlexTable.setText(0, 0, "Park name:");
+		detailsFlexTable.setText(1, 0, "Street address:");
+		detailsFlexTable.setText(2, 0, "Neighbourhood:");
+		detailsFlexTable.setText(3, 0, "Neighbourhood URL:");
+		detailsFlexTable.setText(4, 0, "Facilities:");
+		detailsFlexTable.setText(5, 0, "Special features:");
+		detailsFlexTable.setText(6, 0, "Washrooms:");
+		
+		getParkDetails(parkId);
+
+		// Assemble details panel.
+		detailsPanel.add(detailsLabel);
+		detailsPanel.add(detailsImage);
+		detailsPanel.add(detailsFlexTable);
+		detailsPanel.add(commentsLabel);
+		detailsPanel.add(commentFlexTable);
+		detailsPanel.add(addNewCommentButton);
+
+		// Associate details panel with HTML page.
+		RootPanel.get("parkfinder").add(detailsPanel);
+
+		// Add styles to elements in the panel.
+		detailsPanel.setStyleName("detailsPanel");
+		detailsLabel.addStyleName("detailsLabel");
+		detailsFlexTable.getColumnFormatter().addStyleName(0, "detailsColumns");
+		detailsFlexTable.addStyleName("detailsTable");
+		commentsLabel.addStyleName("detailsLabel");
+
+		// Listen for mouse events on the Add button.
+		addNewCommentButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				RootPanel.get("parkfinder").clear();
+				// TODO load comment panel
+			}
+		});
+	}
+
+	/** 
+	 * Get park details from the server.
+	 * 
+	 * @param parkId the park's id.
+	 */
+	private void getParkDetails(String parkId) {
+		class DetailCallBack implements AsyncCallback<Park> {
+			@Override
+			public void onFailure(Throwable error) {
+				handleError(error);
+			}
+
+			@Override
+			public void onSuccess(Park result) {
+				if (result.getImageUrl() == null) {
+					detailsImage.setUrl("images/no_image_available.png");
+				} else detailsImage.setUrl(result.getImageUrl());
+				detailsFlexTable.setText(0, 1, result.getName());
+				String streetAddress = result.getStreetNumber() + " " + result.getStreetName();
+				detailsFlexTable.setText(1, 1, streetAddress);
+				detailsFlexTable.setText(2, 1, result.getNeighbourhoodName());
+				detailsFlexTable.setText(3, 1, result.getNeighbourhoodURL());
+				detailsFlexTable.setText(4, 1, convertListToString(result.getFacilities()));
+				detailsFlexTable.setText(5, 1, convertListToString(result.getSpecialFeatures()));
+				detailsFlexTable.setText(6, 1, String.valueOf(result.isWashroom()));
+			}
+		}
+
+		detailsService.getParkDetails(parkId, new DetailCallBack());
+	}
+	
+	/** 
+	 * Convert a list of strings to a delimited string.
+	 * 
+	 * @param strings a list of strings.
+	 * @return a delimited string.
+	 * 
+	 * @see http://stackoverflow.com/questions/6244823/convert-liststring-to-delimited-string
+	 */
+	private String convertListToString(List<String> strings) {
+		StringBuilder sb = new StringBuilder();
+		for(String str: strings) {
+		   sb.append(str).append(", ");
+		}
+		sb.deleteCharAt(sb.length()-2); // delete last space and comma
+		String newString = sb.toString();
+		return newString;
+	}
 
 	private void loadComment() {
 		commentService.getComment(new AsyncCallback<String[]>() {
@@ -92,7 +179,6 @@ public class ParkFinder implements EntryPoint {
 		for (String input : inputs) {
 			displayComment(input);
 		}
-
 	}
 
 	private void loadCommentPanel() {
