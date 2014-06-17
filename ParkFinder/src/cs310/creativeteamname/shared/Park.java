@@ -5,27 +5,52 @@ import java.math.BigDecimal;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.jdo.annotations.IdGeneratorStrategy;
+import javax.jdo.annotations.IdentityType;
 import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
-@PersistenceCapable
+/**
+ * Stores information about a park.
+ *
+ */
+@PersistenceCapable(identityType = IdentityType.APPLICATION)
 public class Park implements Serializable {
 	
-	private int parkId;
-    private String name;
-    private boolean official;
-    private String streetNumber;
-    private String streetName;
-    private String eastWestStreet;
-    private String northSouthStreet;
-    private BigDecimal lat;
-    private BigDecimal lon;
-    private float hectare;
-    private String neighbourhoodName;
-    private String neighbourhoodURL;
-    private List<String> facilities;
-    private List<String> specialFeatures;
-    private boolean isWashroom;
-    private String imageUrl;
+	@PrimaryKey
+	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+	private int parkId;    
+	@Persistent
+	private String name;    
+	@Persistent
+	private boolean official;    
+	@Persistent
+	private String streetNumber;    
+	@Persistent
+	private String streetName;    
+	@Persistent
+	private String eastWestStreet;
+	@Persistent
+	private String northSouthStreet;
+	@Persistent
+	private BigDecimal lat;
+	@Persistent
+	private BigDecimal lon;
+	@Persistent
+	private float hectare;
+	@Persistent
+	private String neighbourhoodName;
+	@Persistent
+	private String neighbourhoodURL;
+	@Persistent
+	private List<String> facilities;
+	@Persistent
+	private List<String> specialFeatures;
+	@Persistent
+	private boolean isWashroom;
+	@Persistent
+	private String imageUrl;
 
 	public Park() {
 		facilities = new LinkedList<String>();
@@ -163,7 +188,9 @@ public class Park implements Serializable {
 	public String getImageUrl(){
 		return imageUrl;
 	}
+	
 	public void setImageUrl(String imageUrl){
 		this.imageUrl = imageUrl;
 	}
+	
 }
