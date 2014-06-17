@@ -5,7 +5,6 @@
          version="2.5"
          xmlns="http://java.sun.com/xml/ns/javaee">
 
-  <!-- Servlets -->
   
   
   <!-- Default page to serve -->
@@ -13,4 +12,16 @@
     <welcome-file>ParkFinder.html</welcome-file>
   </welcome-file-list>
 
+   <servlet>
+    <servlet-name>CommentService</servlet-name>
+    <servlet-class>cs310.creativeteamname.server.CommentServiceImpl</servlet-class>
+   </servlet>
+  
+    <servlet-mapping>
+    <servlet-name>CommentService</servlet-name>
+    <url-pattern>/parkfinder/comment</url-pattern>
+  </servlet-mapping>
+  
+   
+  
 </web-app>
