@@ -18,7 +18,7 @@ import cs310.creativeteamname.shared.XmlConstants;
  * @author Dan
  *
  */
-public class DataHandler extends DefaultHandler{
+public class XmlHandler extends DefaultHandler{
 	
 	StringBuffer accumulator;
 	List<Park> parkLocations;
@@ -29,7 +29,10 @@ public class DataHandler extends DefaultHandler{
 	public List<Park> getParkLocations(){
 		return parkLocations;
 	}
-	public DataHandler(){
+	public XmlHandler(List<Park> parkLocations){
+		this.parkLocations = parkLocations;
+	}
+	public XmlHandler(){
 		parkLocations = new LinkedList<Park>();
 	}
 	@Override

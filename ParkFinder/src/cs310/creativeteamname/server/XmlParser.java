@@ -7,11 +7,11 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-public class DataParser {
+public class XmlParser {
 
-	private DataHandler handler;
+	private XmlHandler handler;
 	private InputStream stream;
-	public DataParser(DataHandler handler, InputStream stream){
+	public XmlParser(XmlHandler handler, InputStream stream){
 		this.handler = handler;
 		this.stream = stream;
 	}
