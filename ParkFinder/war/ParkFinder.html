@@ -18,6 +18,10 @@
     <!--                                           -->
     <title>Park Finder</title>
     
+    <!-- Google maps v2 script -->
+    <script src="http://maps.google.com/maps?gwt=1&amp;file=api&amp;v=2&amp;sensor=false" />
+    <script type="text/javascript" language="javascript" src="gwtmaps/gwtmaps.nocache.js"></script>
+        
     <!--                                           -->
     <!-- This script loads your compiled module.   -->
     <!-- If you add any GWT meta tags, they must   -->
@@ -48,20 +52,9 @@
     <h1>Park Finder</h1>
     <div id="commentBox"></div>
      <div id="detailPage"></div>
-
-    <table align="center">
-      
-      <tr>
-        <td id="nameFieldContainer"></td>
-        <td id="sendButtonContainer"></td>
-      </tr>
-      <tr>
-        <td colspan="2" style="color:red;" id="errorLabelContainer"></td>
-      </tr>
-    </table>
     
     <!-- Map test -->
-    <div id="maptest">&nbsp;</div>
+    <div id="maptest" style="border:1px solid #404e70;width:800px;height:600px" align="center">&nbsp;</div>
     
   </body>
 </html>

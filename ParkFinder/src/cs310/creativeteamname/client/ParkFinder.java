@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.shared.GWT;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -13,6 +14,14 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.maps.client.InfoWindowContent;
+import com.google.gwt.maps.client.MapWidget;
+import com.google.gwt.maps.client.control.LargeMapControl;
+import com.google.gwt.maps.client.geom.LatLng;
+import com.google.gwt.maps.client.overlay.Marker;
+import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -58,8 +67,12 @@ public class ParkFinder implements EntryPoint {
 		// when addComment button is pressed leads to comment page
 
 		loadCommentPanel();
-
-	}
+	// Map testing
+		MapMaker maker = MapMaker.getInstance();
+		MapWidget map = maker.getParkMap();	
+		final DockLayoutPanel dock = new DockLayoutPanel(Unit.PX);
+		dock.addNorth(map, 500);
+		RootPanel.get("maptest").add(dock);
 
 	private void loadComment() {
 		commentService.getComment(new AsyncCallback<String[]>() {
