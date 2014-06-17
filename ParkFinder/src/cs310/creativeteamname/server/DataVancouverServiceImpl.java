@@ -3,7 +3,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
 import java.util.LinkedList;
+
+import javax.jdo.JDOHelper;
+import javax.jdo.PersistenceManager;
+import javax.jdo.PersistenceManagerFactory;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -15,7 +20,7 @@ public class DataVancouverServiceImpl extends RemoteServiceServlet implements Da
 	private static final String PARK_IMAGES_FILE_NAME = "park_images.csv";
 	public void refreshData(){
 		
-		LinkedList<Park> parks = new LinkedList<Park>();
+		HashMap<Integer, Park> parks = new HashMap<Integer, Park>();
 		XmlHandler handler = new XmlHandler(parks);
 		InputStream stream;
 		try {
@@ -25,13 +30,22 @@ public class DataVancouverServiceImpl extends RemoteServiceServlet implements Da
 		} catch (IOException e) {
 			return;
 		}
+		save(parks);
+		
 	}
-	private InputStream getXmlStream() throws IOException{
+
+	private InputStream getXmlStream() throws IOException {
 		String url = dataSource;
 		URL obj;
-			obj = new URL(url);
-			URLConnection con = obj.openConnection();
-			InputStream stream = con.getInputStream();
-			return stream;
+		obj = new URL(url);
+		URLConnection con = obj.openConnection();
+		InputStream stream = con.getInputStream();
+		return stream;
+	}
+	
+	private void save(HashMap<Integer, Park> parks){
+		PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory();
+		PersistenceManager pm = pmf.getPersistenceManager();
+		pm.makePersistentAll(parks);
 	}
 }

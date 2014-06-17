@@ -21,19 +21,14 @@ import cs310.creativeteamname.shared.XmlConstants;
 public class XmlHandler extends DefaultHandler{
 	
 	StringBuffer accumulator;
-	List<Park> parkLocations;
+	HashMap<Integer, Park> parkLocations;
 	Park currentPark;
 	TemporaryImageHack hack = new TemporaryImageHack();
-//	Washroom currentWashroom = new Washroom();
-//	Facility currentFacility = new Facility();
-	public List<Park> getParkLocations(){
+	public HashMap<Integer, Park> getParkLocations(){
 		return parkLocations;
 	}
-	public XmlHandler(List<Park> parkLocations){
+	public XmlHandler(HashMap<Integer, Park> parkLocations){
 		this.parkLocations = parkLocations;
-	}
-	public XmlHandler(){
-		parkLocations = new LinkedList<Park>();
 	}
 	@Override
 	public void startDocument(){
@@ -64,7 +59,7 @@ public class XmlHandler extends DefaultHandler{
 	public void endElement(String uri, String localName, String qName) {
 		switch(qName){
 		case XmlConstants.PARK:
-			parkLocations.add(currentPark);
+			parkLocations.put(currentPark.getParkId(), currentPark);
 			break;
 		case XmlConstants.NAME:
 			currentPark.setName(accumulator.toString());
