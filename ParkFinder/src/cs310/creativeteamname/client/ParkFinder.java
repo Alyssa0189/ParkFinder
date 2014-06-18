@@ -64,16 +64,7 @@ public class ParkFinder implements EntryPoint {
 	public void onModuleLoad() {
 		loadCommentPanel();
 		
-	// Map testing
-		MapMaker maker = MapMaker.getInstance();
-		MapWidget map = maker.getParkMap();	
-		final DockLayoutPanel dock = new DockLayoutPanel(Unit.PX);
-		dock.addNorth(map, 500);
-		RootPanel.get("maptest").add(dock);
-
-//		loadDetailsPanel("test");
-		this.addRefreshButton();
-		this.addRetrieveButton();
+	
 	}
 	
 	/** 
