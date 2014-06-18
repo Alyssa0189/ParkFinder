@@ -135,6 +135,9 @@ public class XmlHandler extends DefaultHandler{
 		case XmlConstants.FACILITY_URL:
 			// do nothing - this field is not used
 			break;
+		case XmlConstants.SPECIAL_FEATURE:
+			currentPark.addSpecialFeature(accumulator.toString());
+			break;
 		case XmlConstants.WASHROOM:
 			// do nothing - presence of this element does not guarantee presence of washroom
 			// must check for presence of inner elements.
