@@ -8,8 +8,8 @@ import com.google.gwt.maps.client.geom.LatLng;
 
 public class LightweightPark implements Comparable {
 	
-	LatLng location;	// The latitude and longitude of this park.
-	String name;		// The name of this park.
+	LatLng location;
+	String name;
 	
 	/** Create a new park with a location and name.
 	 * 

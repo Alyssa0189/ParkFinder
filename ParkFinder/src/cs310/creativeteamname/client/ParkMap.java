@@ -14,6 +14,7 @@ import com.google.gwt.maps.client.control.LargeMapControl;
 import com.google.gwt.maps.client.geom.LatLng;
 import com.google.gwt.maps.client.geom.LatLngBounds;
 import com.google.gwt.maps.client.overlay.Marker;
+import com.google.gwt.maps.client.overlay.MarkerOptions;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 
@@ -22,6 +23,7 @@ public class ParkMap {
 	private MapWidget map;
 	private Set<LightweightPark> parks;
 	private MapZoomer zoomer;
+	private VancouverBounds vancouverBounds;
 	
 	/** Create a park map without any parks.
 	 * 
@@ -33,6 +35,7 @@ public class ParkMap {
 		
 		parks = new TreeSet<LightweightPark>();
 		zoomer = new MapZoomer(map);
+		vancouverBounds = VancouverBounds.getInstance();
 	}
 	
 	/** Declare the set of parks on this map.
@@ -40,7 +43,8 @@ public class ParkMap {
 	 * @param parks the parks that will be displayed on the map.
 	 */
 	public void setParks(Set<LightweightPark> parks) {
-		this.parks = new TreeSet<LightweightPark>(parks);
+		for(LightweightPark park : parks)
+			addPark(park);
 	}
 	
 	/** Get the widget representation of this park map.
@@ -48,6 +52,7 @@ public class ParkMap {
 	 * @return the map of parks, complete with names and locations of the parks that have been assigned.
 	 */
 	public MapWidget getWidget() {
+		addParkOverlays();
 		return map;
 	}
 	
@@ -72,7 +77,9 @@ public class ParkMap {
 	 * @param park the park to be added to the map.
 	 */
 	public void addPark(LightweightPark park) {
-		parks.add(park);
+		if(vancouverBounds.containsPark(park)) {
+			this.parks.add(park);
+		}
 	}
 	
 	/** Remove a park from the map.
@@ -83,5 +90,16 @@ public class ParkMap {
 		parks.remove(park);
 	}
 	
+	/** Add the overlays for the parks.
+	 * 
+	 */
+	private void addParkOverlays() {
+		MarkerOptions options = MarkerOptions.newInstance();
+		
+		for(LightweightPark park : parks) {
+			options.setTitle(park.getName());
+			map.addOverlay(new Marker(park.getLocation(), options));
+		}
+	}
 }
 

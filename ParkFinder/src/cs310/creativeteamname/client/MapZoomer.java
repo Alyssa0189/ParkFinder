@@ -12,12 +12,8 @@ import com.google.gwt.maps.client.geom.LatLng;
 import com.google.gwt.maps.client.geom.LatLngBounds;
 
 class MapZoomer {
-	private final double VANCOUVER_SOUTH_LATITUDE = 49.197859;
-	private final double VANCOUVER_NORTH_LATITUDE = 49.316394;
-	private final double VANCOUVER_WEST_LONGITUDE = -123.264599;
-	private final double VANCOUVER_EAST_LONGITUDE = -123.021839;
 	
-	private LatLngBounds vancouverBounds;
+	private VancouverBounds vancouverBounds = new VancouverBounds();
 	MapWidget map;
 	
 	/** Create a new map zoomer associated with the given map.
@@ -26,11 +22,6 @@ class MapZoomer {
 	 */
 	MapZoomer(MapWidget map) {
 		this.map = map;
-		
-		
-		LatLng southWestVancouver = LatLng.newInstance(VANCOUVER_SOUTH_LATITUDE, VANCOUVER_WEST_LONGITUDE);
-		LatLng northEastVancouver = LatLng.newInstance(VANCOUVER_NORTH_LATITUDE, VANCOUVER_EAST_LONGITUDE);
-		vancouverBounds = LatLngBounds.newInstance(southWestVancouver, northEastVancouver);
 	}
 	
 	/** Zoom and center the map on the list of parks.
@@ -40,13 +31,10 @@ class MapZoomer {
 	 */
 	public void zoomAndCenter(Set<LightweightPark> parks) {
 		
-		removeParksNotInBounds(parks);
 		LatLngBounds bounds = getBoundingRectangle(parks);
 		
 		centerOnBounds(bounds);
 		zoomToBounds(bounds);
-		
-
 	}
 	
 	
@@ -59,7 +47,7 @@ class MapZoomer {
 	private LatLngBounds getBoundingRectangle(Set<LightweightPark> parks) {
 		// When there are no parks, default bounds should be all of Vancouver.
 		if(parks.isEmpty())
-			return vancouverBounds;
+			return vancouverBounds.getBounds();
 		
 		Iterator<LightweightPark> parkIter = parks.iterator();
 		LatLngBounds bounds = initializeBoundsToPark(parks, parkIter);
@@ -86,16 +74,6 @@ class MapZoomer {
 		return pointBound;
 	}
 	
-	/** Remove all parks not in Vancouver's bounds from a set of parks.
-	 * 
-	 * @param parks the set of parks to check.
-	 */
-	private void removeParksNotInBounds(Set<LightweightPark> parks) {
-		for(LightweightPark park : parks)
-			if(!parkInBounds(park))
-				parks.remove(park);
-	}
-	
 	/** Get a small bound enclosing a point.
 	 * 
 	 * @param point the point to represent.
@@ -108,7 +86,7 @@ class MapZoomer {
 		LatLng southWestCorner = LatLng.newInstance(pointLat - 0.001, pointLon - 0.001);
 		LatLng northEastCorner = LatLng.newInstance(pointLat + 0.001, pointLon + 0.001);
 		
-		return LatLngBounds.newInstance(northEastCorner, southWestCorner);
+		return LatLngBounds.newInstance(southWestCorner, northEastCorner);
 	}
 	
 	/** Center the map on the center of the given bounds.
@@ -126,9 +104,6 @@ class MapZoomer {
 	 */
 	private void zoomToBounds(LatLngBounds bounds) {
 		int zoomLevel = map.getBoundsZoomLevel(bounds);
-		System.out.println("North east: " + bounds.getNorthEast());
-		System.out.println("South west: " + bounds.getSouthWest());
-		System.out.println("Zoom level: " + zoomLevel);
 		map.setZoomLevel(zoomLevel);
 	}
 
@@ -137,20 +112,10 @@ class MapZoomer {
 	 * 
 	 * @param bounds the bounds so far that may or may not require extension.
 	 * @param park the new park under consideration.
-	 * @return true if the park is outside of the bounds and in Vancouver.
+	 * @return true if the park is outside of the given bounds.
 	 */
 	private boolean boundsRequireExtension(LatLngBounds bounds, LightweightPark park) {
 		LatLng parkLocation = park.getLocation();
 		return !bounds.containsLatLng(parkLocation);
-	}
-	
-	/** Determine whether or not the given park is in the bounds of Vancouver.
-	 * 
-	 * @param park the park that's location will be evaluated.
-	 * @return true if the park is in the bounds of Vancouver.
-	 */
-	private boolean parkInBounds(LightweightPark park) {
-		LatLng parkLocation = park.getLocation();
-		return vancouverBounds.containsLatLng(parkLocation);
 	}
 }

@@ -3,6 +3,8 @@ package cs310.creativeteamname.client;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -14,6 +16,7 @@ import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.maps.client.MapWidget;
+import com.google.gwt.maps.client.geom.LatLng;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -62,9 +65,17 @@ public class ParkFinder implements EntryPoint {
 	 * This is the entry point method.
 	 */	
 	public void onModuleLoad() {
-		loadCommentPanel();
+		// loadCommentPanel();
 		
-	
+		// Map testing, can delete
+		Set<LightweightPark> parks = new TreeSet<LightweightPark>();
+		LatLng park0 = LatLng.newInstance(49.242523, -123.149310);
+		LatLng park1 = LatLng.newInstance(49.239833, -123.110171);
+		LatLng park2 = LatLng.newInstance(49.214497, -123.128367);
+		parks.add(new LightweightPark(park0, "park 0"));
+		parks.add(new LightweightPark(park1, "park 1"));
+		parks.add(new LightweightPark(park2, "park 2"));
+		loadMap(parks);
 	}
 	
 	/** 
@@ -361,6 +372,17 @@ public class ParkFinder implements EntryPoint {
 	private void goToDetailsPage() {
 		// TODO Auto-generated method stub
 
+	}
+	
+	private void loadMap(Set<LightweightPark> parks) {
+		ParkMap map = new ParkMap();
+		map.setParks(parks);
+		
+		final DockLayoutPanel dock = new DockLayoutPanel(Unit.PX);
+		dock.addNorth(map.getWidget(), 500);
+		RootPanel.get("maparea").add(dock);
+		
+		map.zoomAndCenter(500, 400);
 	}
 
 }
