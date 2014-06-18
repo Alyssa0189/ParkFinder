@@ -1,7 +1,9 @@
 package cs310.creativeteamname.client;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.shared.GWT;
@@ -30,6 +32,9 @@ import cs310.creativeteamname.shared.Park;
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class ParkFinder implements EntryPoint {
+	//Dan's button
+	private Button refreshDataButton = new Button("Refresh Data Set");
+	private Button retrieveDataButton = new Button("Test");
 	
 	private VerticalPanel detailsPanel = new VerticalPanel();
 	private Label detailsLabel = new Label("Park Details");
@@ -49,7 +54,8 @@ public class ParkFinder implements EntryPoint {
 	private ArrayList<String> comments = new ArrayList<String>(); 
 	private final CommentServiceAsync commentService = GWT
 			.create(CommentService.class);
-
+	private final DataVancouverServiceAsync dataVancouverService = GWT.create(DataVancouverService.class);
+	private final LocationServiceAsync locationService = GWT.create(LocationService.class);
 	private static final int CHARACTER_LIMIT=250;
 
 	/**
@@ -66,6 +72,8 @@ public class ParkFinder implements EntryPoint {
 		RootPanel.get("maptest").add(dock);
 
 //		loadDetailsPanel("test");
+		this.addRefreshButton();
+		this.addRetrieveButton();
 	}
 	
 	/** 
@@ -112,6 +120,55 @@ public class ParkFinder implements EntryPoint {
 		});
 	}
 
+	private void addRefreshButton() {
+		refreshDataButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				dataVancouverService.refreshData(new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						Logger logger = Logger.getLogger("");
+						logger.severe("Could not load data set");
+					}
+
+					@Override
+					public void onSuccess(Void result) {
+						Logger logger = Logger.getLogger("");
+						logger.severe("Successfully loaded data set - probably");
+					}
+				});
+			}
+		});
+		RootPanel.get("parkfinder").add(refreshDataButton);
+	}
+	/**
+	 * For test purposes only!  Author: DJMCCOOL (Dan)
+	 */
+	private void addRetrieveButton() {
+		retrieveDataButton.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				// TODO Auto-generated method stub
+				locationService.getAllParks(new AsyncCallback<HashMap>() {
+
+					@Override
+					public void onFailure(Throwable caught) {
+						// TODO Auto-generated method stub
+
+					}
+
+					@Override
+					public void onSuccess(HashMap result) {
+						// TODO Auto-generated method stub
+
+					}
+				});
+			}
+		});
+		RootPanel.get("parkfinder").add(retrieveDataButton);
+	}
+	
 	/** 
 	 * Get park details from the server.
 	 * 

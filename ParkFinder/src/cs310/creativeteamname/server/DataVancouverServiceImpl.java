@@ -5,6 +5,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.logging.Logger;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
@@ -20,6 +21,9 @@ public class DataVancouverServiceImpl extends RemoteServiceServlet implements Da
 	private static final String dataSource = "ftp://webftp.vancouver.ca/opendata/xml/parks_facilities.xml";
 	private static final String zipSource = "ftp://webftp.vancouver.ca/opendata/csv/csv_parks_facilities.zip";
 	private static final String PARK_IMAGES_FILE_NAME = "park_images.csv";
+	
+	private static final PersistenceManagerFactory PMF =
+		      JDOHelper.getPersistenceManagerFactory("transactions-optional");
 	public void refreshData(){
 		
 		HashMap<Integer, Park> parks = new HashMap<Integer, Park>();
@@ -32,8 +36,8 @@ public class DataVancouverServiceImpl extends RemoteServiceServlet implements Da
 		} catch (IOException e) {
 			return;
 		}
-		save(parks);
-		
+		//save(parks);
+		LocationServiceImpl.setParks(parks);
 	}
 
 	private InputStream getXmlStream() throws IOException {
@@ -47,11 +51,19 @@ public class DataVancouverServiceImpl extends RemoteServiceServlet implements Da
 	
 	@SuppressWarnings("unchecked")
 	private void save(HashMap<Integer, Park> parks){
-		PersistenceManagerFactory pmf = JDOHelper.getPersistenceManagerFactory();
-		PersistenceManager pm = pmf.getPersistenceManager();
+		PersistenceManager pm = PMF.getPersistenceManager();
 		javax.jdo.Transaction transaction = pm.currentTransaction();
 		transaction.begin();
-		pm.makePersistentAll(parks);
+		//pm.makePersistentAll(parks);
+		Logger logger = Logger.getLogger("");
+		
+		for(Park p : parks.values()){
+			logger.severe("Adding park with id = " + p.getParkId());
+			logger.severe(" and name = " + p.getName());
+			pm.makePersistent(p);
+			//TODO this break statement is used only to test a transaction with a single entity
+			break;
+		}
 		transaction.commit();
 	}
 }
