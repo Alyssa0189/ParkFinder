@@ -274,17 +274,16 @@ public class ParkFinder implements EntryPoint {
 	}
 	
 	private void displayComments(Comment[] comments) {
+		commentFlexTable.removeAllRows();
 		int i = 0;
 		if(comments.length != 0) {
 			noCommentsLabel.setVisible(false);
-			commentFlexTable.setVisible(true);
 			for(Comment comment : comments) {
 				commentFlexTable.setText(i, 1, comment.getInput());
 				i++;
 			}
 		} else {
 			noCommentsLabel.setVisible(true);
-			commentFlexTable.setVisible(false);
 		}
 	}
 
