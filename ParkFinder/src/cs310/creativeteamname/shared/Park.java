@@ -2,8 +2,6 @@ package cs310.creativeteamname.shared;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.LinkedList;
-import java.util.List;
 
 import javax.jdo.annotations.IdGeneratorStrategy;
 import javax.jdo.annotations.IdentityType;

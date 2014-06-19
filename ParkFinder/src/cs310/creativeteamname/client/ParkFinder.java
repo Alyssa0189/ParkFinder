@@ -2,7 +2,6 @@ package cs310.creativeteamname.client;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
@@ -15,8 +14,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.maps.client.MapWidget;
-import com.google.gwt.maps.client.geom.LatLng;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -40,7 +37,6 @@ public class ParkFinder implements EntryPoint {
 	private Button refreshDataButton = new Button("Refresh Data Set");
 	private Button retrieveDataButton = new Button("Test");
 	
-	// testing details
 	private HashMap<Integer, Park> allParks = new HashMap<Integer, Park>(); 
 	
 	private VerticalPanel detailsPanel = new VerticalPanel();
@@ -60,12 +56,12 @@ public class ParkFinder implements EntryPoint {
 			"Please add your comment in the textbox below (maximum characters allowed: 250)");
 	private Button submitButton = new Button("Submit");
 	private Button cancelButton = new Button("Cancel");
-	private ArrayList<String> comments = new ArrayList<String>(); 
 	private final CommentServiceAsync commentService = GWT
 			.create(CommentService.class);
 	private final DataVancouverServiceAsync dataVancouverService = GWT.create(DataVancouverService.class);
 	private final LocationServiceAsync locationService = GWT.create(LocationService.class);
-	private static final int CHARACTER_LIMIT=250;
+	private static final int CHARACTER_LIMIT = 250;
+	private static final String VANCOUVER_URL = "http://vancouver.ca";
 
 	/**
 	 * This is the entry point method.
@@ -89,8 +85,9 @@ public class ParkFinder implements EntryPoint {
 		detailsFlexTable.setText(4, 0, "Facilities:");
 		detailsFlexTable.setText(5, 0, "Special features:");
 		detailsFlexTable.setText(6, 0, "Washrooms:");
-			
-		getParkDetails(parkId);
+		
+		Park park = allParks.get(parkId);
+		displayDetails(park);
 		getComments(parkId);
 
 		// Assemble details panel.
@@ -192,39 +189,71 @@ public class ParkFinder implements EntryPoint {
 
 			@Override
 			public void onSuccess(Park result) {
-				if (result.getImageUrl() == null) {
-					detailsImage.setUrl("images/no_image_available.png");
-				} else detailsImage.setUrl(result.getImageUrl());
-				detailsFlexTable.setText(0, 1, result.getName());
-				String streetAddress = result.getStreetNumber() + " " + result.getStreetName();
-				detailsFlexTable.setText(1, 1, streetAddress);
-				detailsFlexTable.setText(2, 1, result.getNeighbourhoodName());
-				detailsFlexTable.setText(3, 1, result.getNeighbourhoodURL());
-				detailsFlexTable.setText(4, 1, convertListToString(result.getFacilities()));
-				detailsFlexTable.setText(5, 1, convertListToString(result.getSpecialFeatures()));
-				detailsFlexTable.setText(6, 1, String.valueOf(result.isWashroom()));
+				displayDetails(result);
 			}
 		}
 
 		detailsService.getParkDetails(parkId, new DetailCallBack());
 	}
 	
-	/** 
-	 * Convert a list of strings to a delimited string.
+	/**
+	 * Display a park's details in the details panel.
 	 * 
-	 * @param strings a list of strings.
+	 * @param park the park.
+	 */
+	private void displayDetails(Park park) {
+		if(park.getImageUrl() == null) {
+			detailsImage.setUrl("images/no_image_available.png");
+		} else detailsImage.setUrl(VANCOUVER_URL + park.getImageUrl());
+		
+		detailsFlexTable.setText(0, 1, park.getName());
+		
+		String streetAddress = park.getStreetNumber() + " " + park.getStreetName();		
+		detailsFlexTable.setText(1, 1, streetAddress);
+		
+		detailsFlexTable.setText(2, 1, park.getNeighbourhoodName());		
+		detailsFlexTable.setText(3, 1, park.getNeighbourhoodURL());
+		
+		if(park.getFacilities().length==0) {
+			detailsFlexTable.setText(4, 1, "N/A");
+		} else detailsFlexTable.setText(4, 1, convertArrayToString(park.getFacilities()));
+		
+		if(park.getSpecialFeatures().length==0) {
+			detailsFlexTable.setText(5, 1, "N/A");
+		} else detailsFlexTable.setText(5, 1, convertArrayToString(park.getSpecialFeatures()));
+		
+		detailsFlexTable.setText(6, 1, convertBooleanToStr(park.isWashroom()));
+	}
+	
+	/** 
+	 * Convert an array of strings to a delimited string.
+	 * 
+	 * @param strings an array of strings.
 	 * @return a delimited string.
 	 * 
 	 * @see http://stackoverflow.com/questions/6244823/convert-liststring-to-delimited-string
 	 */
-	private String convertListToString(String[] strings) {
+	private String convertArrayToString(String[] strings) {
 		StringBuilder sb = new StringBuilder();
-		for(String str: strings) {
-		   sb.append(str).append(", ");
+		for(String s : strings) {
+			sb.append(s).append(", ");
 		}
 		sb.deleteCharAt(sb.length()-2); // delete last space and comma
-		String newString = sb.toString();
-		return newString;
+		return sb.toString();
+	}
+	
+	/**
+	 * Convert a boolean to a yes/no string.
+	 * 
+	 * @param bool a boolean value.
+	 * @return 'yes' string if bool is true, 'no' string if bool is false.
+	 */
+	private String convertBooleanToStr(boolean bool) {
+		String str = "no";
+		if(bool) {
+			str = "yes";
+		}
+		return str;
 	}
 
 	private void getComments(int parkId) {
