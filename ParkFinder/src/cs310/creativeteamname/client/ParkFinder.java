@@ -76,7 +76,7 @@ public class ParkFinder implements EntryPoint {
 	 * 
 	 * @param parkId the park's id.
 	 */
-	private void loadDetailsPanel(String parkId) {
+	public void loadDetailsPanel(String parkId) {
 		// Create table for park details.
 		detailsFlexTable.setText(0, 0, "Park name:");
 		detailsFlexTable.setText(1, 0, "Street address:");
@@ -385,7 +385,7 @@ public class ParkFinder implements EntryPoint {
 		map.setParks(parks);
 		
 		final DockLayoutPanel dock = new DockLayoutPanel(Unit.PX);
-		dock.addNorth(map.getWidget(), 500);
+		dock.addNorth(map.getWidget(this), 500);
 		RootPanel.get("maparea").add(dock);
 		
 		map.zoomAndCenter(600, 500);

@@ -36,6 +36,14 @@ public class LightweightPark implements Comparable {
 		this.name = heavyPark.getName();
 	}
 	
+	/** Get the id of the park.
+	 * 
+	 * @return the park's id.
+	 */
+	public int getId() {
+		return id;
+	}
+	
 	/** Get the location of the park.
 	 * 
 	 * @return the park's location.
