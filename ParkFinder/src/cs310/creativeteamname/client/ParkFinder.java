@@ -45,7 +45,7 @@ public class ParkFinder implements EntryPoint {
 	private FlexTable detailsFlexTable = new FlexTable();
 	private Button backToMapButton = new Button("Back to map");
 	private Label commentsLabel = new Label("Comments");
-	private Label noCommentsLabel = new Label();
+	private Label noCommentsLabel = new Label("No comments for this park.");
 	private FlexTable commentFlexTable = new FlexTable();
 	private Button addNewCommentButton = new Button("Add your comment");
 	private DetailsServiceAsync detailsService = GWT.create(DetailsService.class);	
@@ -274,11 +274,12 @@ public class ParkFinder implements EntryPoint {
 	private void displayComments(Comment[] comments) {
 		int i = 0;
 		if(comments.length != 0) {
+			noCommentsLabel.setVisible(false);
 			for(Comment comment : comments) {
 				commentFlexTable.setText(i, 1, comment.getInput());
 				i++;
 			}
-		} else noCommentsLabel.setText("No comments for this park.");
+		} else noCommentsLabel.setVisible(true);
 	}
 
 	private void loadCommentPanel(final int parkId) {
