@@ -2,8 +2,12 @@ package cs310.creativeteamname.client;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import cs310.creativeteamname.shared.Comment;
+
 public interface CommentServiceAsync {
-	public void addComment(String input, AsyncCallback<Void> callback) throws IllegalArgumentException;
-	public void getComment(AsyncCallback<String[]> callback);
+
+	public void addComment(Comment comment, AsyncCallback<Void> callback);
+
+	public void getComment(int parkId, AsyncCallback<Comment[]> callback);
 
 }

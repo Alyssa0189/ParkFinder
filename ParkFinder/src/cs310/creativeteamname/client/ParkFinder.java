@@ -29,6 +29,7 @@ import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
+import cs310.creativeteamname.shared.Comment;
 import cs310.creativeteamname.shared.Park;
 
 /**
@@ -39,11 +40,17 @@ public class ParkFinder implements EntryPoint {
 	private Button refreshDataButton = new Button("Refresh Data Set");
 	private Button retrieveDataButton = new Button("Test");
 	
+	// testing details
+	private Button loadParkButton = new Button("Load park details");
+	private HashMap<Integer, Park> allParks = new HashMap<Integer, Park>(); 
+	
 	private VerticalPanel detailsPanel = new VerticalPanel();
 	private Label detailsLabel = new Label("Park Details");
 	private Image detailsImage = new Image();
 	private FlexTable detailsFlexTable = new FlexTable();
+	private Button backToMapButton = new Button("Back to map");
 	private Label commentsLabel = new Label("Comments");
+	private Label noCommentsLabel = new Label();
 	private FlexTable commentFlexTable = new FlexTable();
 	private Button addNewCommentButton = new Button("Add your comment");
 	private DetailsServiceAsync detailsService = GWT.create(DetailsService.class);	
@@ -51,7 +58,7 @@ public class ParkFinder implements EntryPoint {
 	private VerticalPanel commentPanel = new VerticalPanel();
 	private TextArea commentInputArea = new TextArea();
 	private Label commentHereLabel = new Label(
-			"Please add your comment in the textbox below (maximum character allowed: 250)");
+			"Please add your comment in the textbox below (maximum characters allowed: 250)");
 	private Button submitButton = new Button("Submit");
 	private Button cancelButton = new Button("Cancel");
 	private ArrayList<String> comments = new ArrayList<String>(); 
@@ -68,7 +75,17 @@ public class ParkFinder implements EntryPoint {
 		addRefreshButton();
 		addRetrieveButton();
 		loadCommentPanel();
-
+		addLoadButton();
+	}
+	
+	// testing details
+	private void addLoadButton() {
+		RootPanel.get("test").add(loadParkButton);
+		loadParkButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				// TODO
+			}
+		});
 	}
 	
 	/** 
@@ -85,14 +102,17 @@ public class ParkFinder implements EntryPoint {
 		detailsFlexTable.setText(4, 0, "Facilities:");
 		detailsFlexTable.setText(5, 0, "Special features:");
 		detailsFlexTable.setText(6, 0, "Washrooms:");
-		
+			
 		getParkDetails(parkId);
+		loadComment();
 
 		// Assemble details panel.
 		detailsPanel.add(detailsLabel);
 		detailsPanel.add(detailsImage);
 		detailsPanel.add(detailsFlexTable);
+		detailsPanel.add(backToMapButton);
 		detailsPanel.add(commentsLabel);
+		detailsPanel.add(noCommentsLabel);
 		detailsPanel.add(commentFlexTable);
 		detailsPanel.add(addNewCommentButton);
 
@@ -105,6 +125,14 @@ public class ParkFinder implements EntryPoint {
 		detailsFlexTable.getColumnFormatter().addStyleName(0, "detailsColumns");
 		detailsFlexTable.addStyleName("detailsTable");
 		commentsLabel.addStyleName("detailsLabel");
+		
+		// Listen for mouse events on the Back button.
+		addNewCommentButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				RootPanel.get("parkfinder").clear();
+				// TODO load map panel
+			}
+		});
 
 		// Listen for mouse events on the Add button.
 		addNewCommentButton.addClickHandler(new ClickHandler() {
@@ -144,18 +172,16 @@ public class ParkFinder implements EntryPoint {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				// TODO Auto-generated method stub
 				locationService.getAllParks(new AsyncCallback<HashMap<Integer, Park>>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
 						// TODO Auto-generated method stub
-
 					}
 
 					@Override
 					public void onSuccess(HashMap<Integer, Park> result) {
-						// TODO Auto-generated method stub
+						allParks = result;
 						Set<LightweightPark> parks = getLightParksFromHeavy(result);
 						loadMap(parks);
 					}
@@ -215,23 +241,29 @@ public class ParkFinder implements EntryPoint {
 	}
 
 	private void loadComment() {
-		commentService.getComment(new AsyncCallback<String[]>() {
-			public void onFailure(Throwable error) {
-				handleError(error);
+		// TODO pass parkId as parameter
+		commentService.getComment(1, new AsyncCallback<Comment[]>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				handleError(caught);				
 			}
 
-			public void onSuccess(String[] inputs) {
-				displayComments(inputs);
+			@Override
+			public void onSuccess(Comment[] result) {
+				displayComments(result);
 				
 			}
 		});
 	}
-
-	private void displayComments(String[] inputs) {
-		// display comments on main page
-		for (String input : inputs) {
-			displayComment(input);
-		}
+	
+	private void displayComments(Comment[] comments) {
+		int i = 0;
+		if(comments.length != 0) {
+			for(Comment comment : comments) {
+				commentFlexTable.setText(i, 1, comment.getInput());
+				i++;
+			}
+		} else noCommentsLabel.setText("No comments for this park.");
 	}
 
 	private void loadCommentPanel() {
@@ -241,13 +273,10 @@ public class ParkFinder implements EntryPoint {
 		// Reference used:
 		// http://stackoverflow.com/questions/6980908/maxlength-for-gwt-textarea
 		commentInputArea.getElement().setAttribute("maxlength", "250");
-
-		loadComment();
 		
-		//Assemble comment panel
+		// Assemble comment panel
 		commentPanel.setSpacing(10);
-		commentPanel
-				.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+		commentPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		commentPanel.setSize("500", "500");
 		commentPanel.add(commentHereLabel);
 		commentPanel.add(commentInputArea);
@@ -265,7 +294,7 @@ public class ParkFinder implements EntryPoint {
 		// Listen for mouse events on the cancel button
 		cancelButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				goToDetailsPage();
+				// TODO load details panel
 			}
 		});
 
@@ -277,97 +306,38 @@ public class ParkFinder implements EntryPoint {
 				}
 			}
 		});
-
 	}
 
-	/*when submitComment button is pressed it stores comment in our db and
-	displays it in details page*/
 	private void addComment() {
 		final String input = commentInputArea.getText().trim();
-		commentInputArea.setFocus(true);
+		Comment comment = new Comment();
+		comment.setInput(input);
+		// TODO pass parkId as parameter
+		comment.setParkId(1);
 
-		try {
-			if (input.isEmpty()) {
-			}
-		} catch (IllegalArgumentException e) {
-			Window.alert("Please add a comment");
-		}
-		
-		
-		try {
-			if (input.length() > CHARACTER_LIMIT) {
-
-			}
-		} catch (IllegalArgumentException e) {
-			Window.alert ("You have exceeded 250 character limit");
-
-		}
-		if (comments.contains(input))
-			return;
-		addCommentToDb(input);
-
+		if((!input.isEmpty()) && (input.length() < CHARACTER_LIMIT)) {
+			addComment(comment);
+		} else Window.alert("Please input a comment.");
 	}
-
 	
-	// adds comment to database
-	private void addCommentToDb(final String input) {
-		commentService.addComment(input, new AsyncCallback<Void>() {
+	private void addComment(Comment comment) {
+		commentService.addComment(comment, new AsyncCallback<Void>() {
+			@Override
 			public void onFailure(Throwable error) {
 				handleError(error);
 			}
-
+			
+			@Override
 			public void onSuccess(Void ignore) {
-				// store comment in db and go to detail page where comment shows
-				displayComment(input);
-				// updateCommentTable(input);
-
+				// TODO load details panel
 			}
 		});
 
 	}
 
-	private void displayComment(final String input) {
-		// Add comments to table which is displayed on details page
-		goToDetailsPage();
-		
-		int row = commentFlexTable.getRowCount();
-		comments.add(input);
-		commentFlexTable.setText(row, 0, input);
-		// commentFlexTable.setWidget(row, 2, new Label());
-		// CommentDetail[] input=new CommentDetail[comments.size()];
-
-	}
-
-	/*
-	 * Update a single row in comment table
-	 * 
-	 * @param comment
-	 */
-	// NOTE: This method hasn't been called yet
-	private void updateCommentTable(CommentDetail[] input) {
-		CommentDetail[] inputs = new CommentDetail[comments.size()];
-		for (int i = 0; i < comments.size(); i++) {
-			updateCommentTable(input[i]);
-		}
-
-	}
-
-	private void updateCommentTable(CommentDetail input) {
-		int row = comments.indexOf(input.getInput()) + 1;
-
-		// Populate the input field with new data
-		commentFlexTable.setText(row, 1, input.getInput());
-	}
-
 	private void handleError(Throwable error) {
 		Window.alert(error.getMessage());
-	}
-
-	private void goToDetailsPage() {
-		// TODO Auto-generated method stub
-
-	}
-	
+	}	
 	
 	private Set<LightweightPark> getLightParksFromHeavy(HashMap<Integer, Park> heavyParks) {
 		Set<LightweightPark> lightParks = new TreeSet<LightweightPark>();
