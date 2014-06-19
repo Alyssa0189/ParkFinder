@@ -19,7 +19,8 @@ import cs310.creativeteamname.shared.XmlConstants;
  *
  */
 public class XmlHandler extends DefaultHandler{
-	
+	List<String> specialFeatures = new LinkedList<String>();
+	List<String> facilities = new LinkedList<String>();
 	StringBuffer accumulator;
 	HashMap<Integer, Park> parkLocations;
 	Park currentPark;
@@ -59,7 +60,11 @@ public class XmlHandler extends DefaultHandler{
 	public void endElement(String uri, String localName, String qName) {
 		switch(qName){
 		case XmlConstants.PARK:
+			currentPark.setFacilities((String[])facilities.toArray(new String[facilities.size()]));
+			currentPark.setSpecialFeatures((String[])specialFeatures.toArray(new String[specialFeatures.size()]));
 			parkLocations.put(currentPark.getParkId(), currentPark);
+			specialFeatures = new LinkedList<String>();
+			facilities = new LinkedList<String>();
 			break;
 		case XmlConstants.NAME:
 			currentPark.setName(accumulator.toString());
@@ -130,13 +135,15 @@ public class XmlHandler extends DefaultHandler{
 			// do nothing - this field is not used
 			break;
 		case XmlConstants.FACILITY_TYPE:
-			currentPark.addFacility(accumulator.toString());
+			//currentPark.addFacility(accumulator.toString());
+			facilities.add(accumulator.toString());
 			break;
 		case XmlConstants.FACILITY_URL:
 			// do nothing - this field is not used
 			break;
 		case XmlConstants.SPECIAL_FEATURE:
-			currentPark.addSpecialFeature(accumulator.toString());
+			//currentPark.addSpecialFeature(accumulator.toString());
+			specialFeatures.add(accumulator.toString());
 			break;
 		case XmlConstants.WASHROOM:
 			// do nothing - presence of this element does not guarantee presence of washroom

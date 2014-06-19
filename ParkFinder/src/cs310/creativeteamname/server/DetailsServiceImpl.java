@@ -33,9 +33,8 @@ public class DetailsServiceImpl extends RemoteServiceServlet implements DetailsS
 		park.setStreetName("Fake Street");
 		park.setNeighbourhoodName("Point Grey");
 		park.setNeighbourhoodURL("www.google.ca");
-		park.addFacility("facility 1");
-		park.addFacility("facility 2");
-		park.addSpecialFeature("feature 1");
+		park.setFacilities(new String[]{"Facility 1", "Facility 2"});
+		park.setSpecialFeatures(new String[]{"Special Feature", "Dan wuz hereeee", "DAN RULEZ"});
 		return park;
 	}
 	

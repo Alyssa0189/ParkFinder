@@ -20,6 +20,9 @@ public class Park implements Serializable {
 	
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
+	private Long id;
+	
+	@Persistent
 	private int parkId;    
 	@Persistent
 	private String name;    
@@ -44,17 +47,17 @@ public class Park implements Serializable {
 	@Persistent
 	private String neighbourhoodURL;
 	@Persistent
-	private List<String> facilities;
+	private String[] facilities;
 	@Persistent
-	private List<String> specialFeatures;
+	private String[] specialFeatures;
 	@Persistent
 	private boolean isWashroom;
 	@Persistent
 	private String imageUrl;
 
 	public Park() {
-		facilities = new LinkedList<String>();
-		specialFeatures = new LinkedList<String>();
+		facilities = new String[]{};
+		specialFeatures = new String[]{};
 		isWashroom = false;
 	}
     
@@ -154,27 +157,20 @@ public class Park implements Serializable {
 		this.neighbourhoodURL = neighbourhoodURL;
 	}
 	
-	public List<String> getFacilities() {
+	public String[] getFacilities() {
 		return facilities;
 	}
 
-	public void setFacilities(List<String> facilities) {
+	public void setFacilities(String[] facilities) {
 		this.facilities = facilities;
 	}
 
-	public void addFacility(String facility){
-		facilities.add(facility);
-	}
-	public List<String> getSpecialFeatures() {
+	public String[] getSpecialFeatures() {
 		return specialFeatures;
 	}
 
-	public void setSpecialFeatures(List<String> specialFeatures) {
+	public void setSpecialFeatures(String[] specialFeatures) {
 		this.specialFeatures = specialFeatures;
-	}
-	
-	public void addSpecialFeature(String specialFeature){
-		specialFeatures.add(specialFeature);
 	}
 
 	public boolean isWashroom() {

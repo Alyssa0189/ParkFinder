@@ -217,7 +217,7 @@ public class ParkFinder implements EntryPoint {
 	 * 
 	 * @see http://stackoverflow.com/questions/6244823/convert-liststring-to-delimited-string
 	 */
-	private String convertListToString(List<String> strings) {
+	private String convertListToString(String[] strings) {
 		StringBuilder sb = new StringBuilder();
 		for(String str: strings) {
 		   sb.append(str).append(", ");
