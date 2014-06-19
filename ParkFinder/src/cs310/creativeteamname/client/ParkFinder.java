@@ -149,7 +149,7 @@ public class ParkFinder implements EntryPoint {
 				});
 			}
 		});
-		RootPanel.get("parkfinder").add(refreshDataButton);
+		RootPanel.get("admin").add(refreshDataButton);
 	}
 	/**
 	 * For test purposes only!  Author: DJMCCOOL (Dan)
@@ -175,7 +175,7 @@ public class ParkFinder implements EntryPoint {
 				});
 			}
 		});
-		RootPanel.get("parkfinder").add(retrieveDataButton);
+		RootPanel.get("admin").add(retrieveDataButton);
 	}
 	
 	/** 
