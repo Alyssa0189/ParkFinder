@@ -6,19 +6,34 @@ package cs310.creativeteamname.client;
 
 import com.google.gwt.maps.client.geom.LatLng;
 
+import cs310.creativeteamname.shared.Park;
+
 public class LightweightPark implements Comparable {
 	
+	int id;
 	LatLng location;
 	String name;
 	
-	/** Create a new park with a location and name.
+	/** Create a new park with an id, location and name.
 	 * 
 	 * @param location the park's location.
 	 * @param name the park's name.
 	 */
-	public LightweightPark(LatLng location, String name) {
+	public LightweightPark(int id, LatLng location, String name) {
+		this.id = id;
 		this.location = location;
 		this.name = name;
+	}
+	
+	public LightweightPark(Park heavyPark) {
+		this.id = heavyPark.getParkId();
+		
+		double latitude = heavyPark.getLat().doubleValue();
+		double longitude = heavyPark.getLon().doubleValue();
+		this.location = LatLng.newInstance(latitude, longitude);
+		
+		
+		this.name = heavyPark.getName();
 	}
 	
 	/** Get the location of the park.

@@ -46,17 +46,7 @@
     <servlet-name>facebookService</servlet-name>
     <url-pattern>/parkfinder/facebook</url-pattern>
   </servlet-mapping>
-  
-  <servlet>
-    <servlet-name>googleMapService</servlet-name>
-    <servlet-class>cs310.creativeteamname.server.GoogleMapServiceImpl</servlet-class>
-  </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>googleMapService</servlet-name>
-    <url-pattern>/parkfinder/map</url-pattern>
-  </servlet-mapping>
-  
+
   <servlet>
     <servlet-name>locationService</servlet-name>
     <servlet-class>cs310.creativeteamname.server.LocationServiceImpl</servlet-class>

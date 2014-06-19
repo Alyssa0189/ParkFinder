@@ -65,17 +65,10 @@ public class ParkFinder implements EntryPoint {
 	 * This is the entry point method.
 	 */	
 	public void onModuleLoad() {
-		// loadCommentPanel();
-		
-		// Map testing, can delete
-		Set<LightweightPark> parks = new TreeSet<LightweightPark>();
-		LatLng park0 = LatLng.newInstance(49.242523, -123.149310);
-		LatLng park1 = LatLng.newInstance(49.239833, -123.110171);
-		LatLng park2 = LatLng.newInstance(49.214497, -123.128367);
-		parks.add(new LightweightPark(park0, "park 0"));
-		parks.add(new LightweightPark(park1, "park 1"));
-		parks.add(new LightweightPark(park2, "park 2"));
-		loadMap(parks);
+		addRefreshButton();
+		addRetrieveButton();
+		loadCommentPanel();
+
 	}
 	
 	/** 
@@ -152,7 +145,7 @@ public class ParkFinder implements EntryPoint {
 			@Override
 			public void onClick(ClickEvent event) {
 				// TODO Auto-generated method stub
-				locationService.getAllParks(new AsyncCallback<HashMap>() {
+				locationService.getAllParks(new AsyncCallback<HashMap<Integer, Park>>() {
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -161,9 +154,10 @@ public class ParkFinder implements EntryPoint {
 					}
 
 					@Override
-					public void onSuccess(HashMap result) {
+					public void onSuccess(HashMap<Integer, Park> result) {
 						// TODO Auto-generated method stub
-
+						Set<LightweightPark> parks = getLightParksFromHeavy(result);
+						loadMap(parks);
 					}
 				});
 			}
@@ -374,6 +368,18 @@ public class ParkFinder implements EntryPoint {
 
 	}
 	
+	
+	private Set<LightweightPark> getLightParksFromHeavy(HashMap<Integer, Park> heavyParks) {
+		Set<LightweightPark> lightParks = new TreeSet<LightweightPark>();
+		
+		for(Park heavyPark : heavyParks.values()) {
+			LightweightPark lightPark = new LightweightPark(heavyPark);
+			lightParks.add(lightPark);
+		}
+		
+		return lightParks;
+	}
+	
 	private void loadMap(Set<LightweightPark> parks) {
 		ParkMap map = new ParkMap();
 		map.setParks(parks);
@@ -382,7 +388,7 @@ public class ParkFinder implements EntryPoint {
 		dock.addNorth(map.getWidget(), 500);
 		RootPanel.get("maparea").add(dock);
 		
-		map.zoomAndCenter(500, 400);
+		map.zoomAndCenter(600, 500);
 	}
 
 }

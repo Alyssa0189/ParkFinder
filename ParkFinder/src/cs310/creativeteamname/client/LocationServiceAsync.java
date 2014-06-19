@@ -7,5 +7,5 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import cs310.creativeteamname.shared.Park;
 
 public interface LocationServiceAsync {
-	public void getAllParks(AsyncCallback<HashMap> callback);
+	public void getAllParks(AsyncCallback<HashMap<Integer, Park>> callback);
 }
