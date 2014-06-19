@@ -34,8 +34,8 @@ import cs310.creativeteamname.shared.Park;
  */
 public class ParkFinder implements EntryPoint {
 	//Dan's button
-	private Button refreshDataButton = new Button("Refresh Data Set");
-	private Button retrieveDataButton = new Button("Test");
+	private Button refreshDataButton = new Button("Refresh data set");
+	private Button retrieveDataButton = new Button("Retrieve data set");
 	
 	private HashMap<Integer, Park> allParks = new HashMap<Integer, Park>(); 
 	
@@ -136,12 +136,14 @@ public class ParkFinder implements EntryPoint {
 					public void onFailure(Throwable caught) {
 						Logger logger = Logger.getLogger("");
 						logger.severe("Could not load data set");
+						Window.alert("Could not load data set :(");
 					}
 
 					@Override
 					public void onSuccess(Void result) {
 						Logger logger = Logger.getLogger("");
 						logger.severe("Successfully loaded data set - probably");
+						Window.alert("Successfully loaded data set - yay!");;
 					}
 				});
 			}
