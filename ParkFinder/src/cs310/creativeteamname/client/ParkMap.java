@@ -126,8 +126,7 @@ public class ParkMap {
 	 * @param id the id of the park to display.
 	 */
 	private void displayParkDetails(LightweightPark park) {
-		String parkId = Integer.toString(park.getId());
-		this.parkFinder.loadDetailsPanel(parkId);
+		this.parkFinder.loadDetailsPanel(park.getId());
 	}
 	
 	/** Get the marker options for a park's icon.

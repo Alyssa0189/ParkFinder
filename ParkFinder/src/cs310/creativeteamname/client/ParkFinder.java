@@ -41,7 +41,6 @@ public class ParkFinder implements EntryPoint {
 	private Button retrieveDataButton = new Button("Test");
 	
 	// testing details
-	private Button loadParkButton = new Button("Load park details");
 	private HashMap<Integer, Park> allParks = new HashMap<Integer, Park>(); 
 	
 	private VerticalPanel detailsPanel = new VerticalPanel();
@@ -74,18 +73,6 @@ public class ParkFinder implements EntryPoint {
 	public void onModuleLoad() {
 		addRefreshButton();
 		addRetrieveButton();
-		loadCommentPanel();
-		addLoadButton();
-	}
-	
-	// testing details
-	private void addLoadButton() {
-		RootPanel.get("test").add(loadParkButton);
-		loadParkButton.addClickHandler(new ClickHandler() {
-			public void onClick(ClickEvent event) {
-				// TODO
-			}
-		});
 	}
 	
 	/** 
@@ -93,7 +80,7 @@ public class ParkFinder implements EntryPoint {
 	 * 
 	 * @param parkId the park's id.
 	 */
-	public void loadDetailsPanel(String parkId) {
+	public void loadDetailsPanel(final int parkId) {
 		// Create table for park details.
 		detailsFlexTable.setText(0, 0, "Park name:");
 		detailsFlexTable.setText(1, 0, "Street address:");
@@ -104,7 +91,7 @@ public class ParkFinder implements EntryPoint {
 		detailsFlexTable.setText(6, 0, "Washrooms:");
 			
 		getParkDetails(parkId);
-		loadComment();
+		getComments(parkId);
 
 		// Assemble details panel.
 		detailsPanel.add(detailsLabel);
@@ -127,7 +114,7 @@ public class ParkFinder implements EntryPoint {
 		commentsLabel.addStyleName("detailsLabel");
 		
 		// Listen for mouse events on the Back button.
-		addNewCommentButton.addClickHandler(new ClickHandler() {
+		backToMapButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				RootPanel.get("parkfinder").clear();
 				// TODO load map panel
@@ -138,7 +125,7 @@ public class ParkFinder implements EntryPoint {
 		addNewCommentButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				RootPanel.get("parkfinder").clear();
-				// TODO load comment panel
+				loadCommentPanel(parkId);
 			}
 		});
 	}
@@ -196,7 +183,7 @@ public class ParkFinder implements EntryPoint {
 	 * 
 	 * @param parkId the park's id.
 	 */
-	private void getParkDetails(String parkId) {
+	private void getParkDetails(int parkId) {
 		class DetailCallBack implements AsyncCallback<Park> {
 			@Override
 			public void onFailure(Throwable error) {
@@ -240,9 +227,8 @@ public class ParkFinder implements EntryPoint {
 		return newString;
 	}
 
-	private void loadComment() {
-		// TODO pass parkId as parameter
-		commentService.getComment(1, new AsyncCallback<Comment[]>() {
+	private void getComments(int parkId) {
+		commentService.getComment(parkId, new AsyncCallback<Comment[]>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				handleError(caught);				
@@ -266,7 +252,7 @@ public class ParkFinder implements EntryPoint {
 		} else noCommentsLabel.setText("No comments for this park.");
 	}
 
-	private void loadCommentPanel() {
+	private void loadCommentPanel(final int parkId) {
 		// Move cursor focus to the input box
 		commentInputArea.setFocus(true);
 		// Limited the number of characters in text
@@ -282,19 +268,20 @@ public class ParkFinder implements EntryPoint {
 		commentPanel.add(commentInputArea);
 		commentPanel.add(submitButton);
 		commentPanel.add(cancelButton);
-		RootPanel.get("commentBox").add(commentPanel);
+		RootPanel.get("parkfinder").add(commentPanel);
 
 		// Listen for mouse events on the submit button
 		submitButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				addComment();
+				addComment(parkId);
 			}
 		});
 
 		// Listen for mouse events on the cancel button
 		cancelButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				// TODO load details panel
+				RootPanel.get("parkfinder").clear();
+				loadDetailsPanel(parkId);
 			}
 		});
 
@@ -302,25 +289,24 @@ public class ParkFinder implements EntryPoint {
 		commentInputArea.addKeyDownHandler(new KeyDownHandler() {
 			public void onKeyDown(KeyDownEvent event) {
 				if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-					addComment();
+					addComment(parkId);
 				}
 			}
 		});
 	}
 
-	private void addComment() {
+	private void addComment(int parkId) {
 		final String input = commentInputArea.getText().trim();
 		Comment comment = new Comment();
 		comment.setInput(input);
-		// TODO pass parkId as parameter
-		comment.setParkId(1);
+		comment.setParkId(parkId);
 
 		if((!input.isEmpty()) && (input.length() < CHARACTER_LIMIT)) {
-			addComment(comment);
+			addComment(comment, parkId);
 		} else Window.alert("Please input a comment.");
 	}
 	
-	private void addComment(Comment comment) {
+	private void addComment(Comment comment, final int parkId) {
 		commentService.addComment(comment, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable error) {
@@ -329,7 +315,8 @@ public class ParkFinder implements EntryPoint {
 			
 			@Override
 			public void onSuccess(Void ignore) {
-				// TODO load details panel
+				RootPanel.get("parkfinder").clear();
+				loadDetailsPanel(parkId);
 			}
 		});
 

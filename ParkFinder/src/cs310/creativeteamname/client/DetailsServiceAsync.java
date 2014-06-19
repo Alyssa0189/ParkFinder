@@ -6,6 +6,6 @@ import cs310.creativeteamname.shared.Park;
 
 public interface DetailsServiceAsync {
 	
-	public void getParkDetails(String parkId, AsyncCallback<Park> async);
+	public void getParkDetails(int parkId, AsyncCallback<Park> async);
 
 }
