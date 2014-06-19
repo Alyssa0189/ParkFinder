@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import javax.jdo.Extent;
 import javax.jdo.JDOHelper;
@@ -44,10 +46,33 @@ public class DataVancouverServiceImpl extends RemoteServiceServlet implements Da
 		} catch (IOException e) {
 			return;
 		}
+		parseImageData(parks);
 		save(parks);
 		//LocationServiceImpl.setParks(parks);
 	}
-
+	
+	private void parseImageData(HashMap<Integer, Park> parks){
+		String url = zipSource;
+		URL obj;
+		try {
+			obj = new URL(url);
+			URLConnection con = obj.openConnection();
+			InputStream stream = con.getInputStream();
+			ZipInputStream zipIn = new ZipInputStream(stream);
+	        ZipEntry entry = zipIn.getNextEntry();
+	        // iterates over entries in the zip file
+	        while (entry != null) {
+	        	if(PARK_IMAGES_FILE_NAME.equals(entry.getName())){
+	        		CsvStreamReader.addImagesWithLibrary(zipIn, parks);
+	        		break;
+	        	}
+	        	entry = zipIn.getNextEntry();
+	        }
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	private InputStream getXmlStream() throws IOException {
 		String url = dataSource;
 		URL obj;

@@ -24,7 +24,6 @@ public class XmlHandler extends DefaultHandler{
 	StringBuffer accumulator;
 	HashMap<Integer, Park> parkLocations;
 	Park currentPark;
-	TemporaryImageHack hack = new TemporaryImageHack();
 	public HashMap<Integer, Park> getParkLocations(){
 		return parkLocations;
 	}
@@ -46,7 +45,6 @@ public class XmlHandler extends DefaultHandler{
 			try{
 				int id = Integer.parseInt(atts.getValue(XmlConstants.PARK_ID));
 				currentPark.setParkId(id);
-				currentPark.setImageUrl(hack.getImage(id));
 			}catch(NumberFormatException nfe){
 				// do nothing
 			}
