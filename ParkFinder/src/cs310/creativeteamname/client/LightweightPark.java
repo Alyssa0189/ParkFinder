@@ -25,6 +25,21 @@ public class LightweightPark implements Comparable {
 		this.name = name;
 	}
 	
+	/** Create a new lightweight park from an existing lightweight park.
+	 * 
+	 * @param other the other lightweight park to copy.
+	 */
+	public LightweightPark(LightweightPark other) {
+		this.id = other.getId();
+		
+		LatLng location = other.getLocation();
+		this.location = LatLng.newInstance(location.getLatitude(), location.getLongitude());
+	}
+	
+	/** Create a new lightweight park from a normal park.
+	 * 
+	 * @param heavyPark the park to create this lightweight park from.
+	 */
 	public LightweightPark(Park heavyPark) {
 		this.id = heavyPark.getParkId();
 		
@@ -106,3 +121,4 @@ public class LightweightPark implements Comparable {
 		
 	}
 }
+

@@ -111,11 +111,15 @@ public class ParkMap {
 			Marker parkMarker = new Marker(park.getLocation(), options);
 
 			map.addOverlay(parkMarker);
-			this.currentPark = park;
-			
+
+			LightweightPark p1 = new LightweightPark(park);
+			this.currentPark = p1;
+
 			parkMarker.addMarkerClickHandler(new MarkerClickHandler() {
+				LightweightPark p = currentPark;
+				
 				public void onClick(MarkerClickEvent event) {
-					displayParkDetails(ParkMap.this.currentPark);
+					displayParkDetails(p);
 				}
 			});
 		}
@@ -127,6 +131,7 @@ public class ParkMap {
 	 */
 	private void displayParkDetails(LightweightPark park) {
 		this.parkFinder.loadDetailsPanel(park.getId());
+		System.out.println("Display park id: " + park.getId() + " with name " + park.getName());
 	}
 	
 	/** Get the marker options for a park's icon.
