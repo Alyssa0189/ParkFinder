@@ -352,12 +352,15 @@ public class ParkFinder implements EntryPoint {
 			}
 		} else {
 			noCommentsLabel.setVisible(true);
+			
 		}
 	}
 	
 	private void displayThreeComments(Comment[] comments) {
+		commentFlexTable.removeAllRows();
 		int i = 0;
 		if (comments.length != 0) {
+			noCommentsLabel.setVisible(false);
 			for (Comment comment : comments) {
 				if (i < 3) {
 					commentFlexTable.setText(i, 1, comment.getInput());
@@ -365,7 +368,8 @@ public class ParkFinder implements EntryPoint {
 				i++;
 			}
 		} else
-			noCommentsLabel.setText("No comments for this park.");
+			noCommentsLabel.setVisible(true);
+		
 	}
 
 
