@@ -99,6 +99,7 @@ public class ParkFinder implements EntryPoint {
 	 */
 	public void loadDetailsPanel(final int parkId) {
 		RootPanel.get("admin").clear();
+		RootPanel.get("comments").clear();
 		detailsPanel = new VerticalPanel();
 		addNewCommentButton = new Button("Add your comment");
 		backToMapButton = new Button("Back to map");
