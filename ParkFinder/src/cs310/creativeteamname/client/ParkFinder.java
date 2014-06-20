@@ -36,7 +36,7 @@ import cs310.creativeteamname.shared.Park;
 public class ParkFinder implements EntryPoint {
 	//Dan's button
 	private Button refreshDataButton = new Button("Refresh data set");
-	private Button retrieveDataButton = new Button("Retrieve data set");
+	private Button retrieveDataButton = new Button("Refresh map");
 	
 	private HashMap<Integer, Park> allParks = new HashMap<Integer, Park>(); 
 	
@@ -72,6 +72,20 @@ public class ParkFinder implements EntryPoint {
 	public void onModuleLoad() {
 		addRefreshButton();
 		addRetrieveButton();
+		locationService.getAllParks(new AsyncCallback<HashMap<Integer, Park>>() {
+
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+			}
+
+			@Override
+			public void onSuccess(HashMap<Integer, Park> result) {
+				allParks = result;
+				parksOnMap = getLightParksFromHeavy(result);
+				loadMap(parksOnMap);
+			}
+		});
 	}
 	
 	/** 
@@ -80,6 +94,10 @@ public class ParkFinder implements EntryPoint {
 	 * @param parkId the park's id.
 	 */
 	public void loadDetailsPanel(final int parkId) {
+		RootPanel.get("admin").clear();
+		detailsPanel = new VerticalPanel();
+		addNewCommentButton = new Button("Add your comment");
+		backToMapButton = new Button("Back to map");
 		// Create table for park details.
 		detailsFlexTable.setText(0, 0, "Park name:");
 		detailsFlexTable.setText(1, 0, "Street address:");
@@ -131,6 +149,7 @@ public class ParkFinder implements EntryPoint {
 	}
 
 	private void addRefreshButton() {
+		refreshDataButton = new Button("Refresh data set");
 		refreshDataButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -157,6 +176,7 @@ public class ParkFinder implements EntryPoint {
 	 * For test purposes only!  Author: DJMCCOOL (Dan)
 	 */
 	private void addRetrieveButton() {
+		retrieveDataButton = new Button("Refresh map");
 		retrieveDataButton.addClickHandler(new ClickHandler() {
 
 			@Override
@@ -292,6 +312,7 @@ public class ParkFinder implements EntryPoint {
 
 	private void loadCommentPanel(final int parkId) {
 		// Move cursor focus to the input box
+		commentInputArea = new TextArea();
 		commentInputArea.setFocus(true);
 		// Limited the number of characters in text
 		// Reference used:
@@ -299,14 +320,21 @@ public class ParkFinder implements EntryPoint {
 		commentInputArea.getElement().setAttribute("maxlength", "250");
 		
 		// Assemble comment panel
+		commentPanel = new VerticalPanel();
 		commentPanel.setSpacing(10);
 		commentPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		commentPanel.setSize("500", "500");
 		commentPanel.add(commentHereLabel);
 		commentPanel.add(commentInputArea);
-		commentPanel.add(submitButton);
+		
+		//Buttons
+		submitButton = new Button("Submit");
+		cancelButton = new Button("Cancel");
 		commentPanel.add(cancelButton);
-		RootPanel.get("parkfinder").add(commentPanel);
+		commentPanel.add(submitButton);
+		
+		RootPanel.get("comments").clear();
+		RootPanel.get("comments").add(commentPanel);
 
 		// Listen for mouse events on the submit button
 		submitButton.addClickHandler(new ClickHandler() {
@@ -386,6 +414,9 @@ public class ParkFinder implements EntryPoint {
 	 * @param parks the parks that will be displayed on the map.
 	 */
 	private void loadMap(Set<LightweightPark> parks) {
+		RootPanel.get("admin").clear();
+		addRetrieveButton();
+		addRefreshButton();
 		parkMap = new ParkMap();
 		parkMap.setParks(parks);
 		
