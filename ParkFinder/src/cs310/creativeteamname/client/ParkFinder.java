@@ -65,6 +65,7 @@ public class ParkFinder implements EntryPoint {
 	private static final String VANCOUVER_URL = "http://vancouver.ca";
 	private Set<LightweightPark> parksOnMap;
 	private ParkMap parkMap;
+	private Label mapFailedToLoadText = new Label("The map failed to load!");
 
 	/**
 	 * This is the entry point method.
@@ -130,6 +131,7 @@ public class ParkFinder implements EntryPoint {
 		detailsFlexTable.getColumnFormatter().addStyleName(0, "detailsColumns");
 		detailsFlexTable.addStyleName("detailsTable");
 		commentsLabel.addStyleName("detailsLabel");
+		mapFailedToLoadText.addStyleName("mapLoadFailLabel");
 		
 		// Listen for mouse events on the Back button.
 		backToMapButton.addClickHandler(new ClickHandler() {
@@ -414,18 +416,20 @@ public class ParkFinder implements EntryPoint {
 	 * @param parks the parks that will be displayed on the map.
 	 */
 	private void loadMap(Set<LightweightPark> parks) {
-		RootPanel.get("admin").clear();
-		addRetrieveButton();
-		addRefreshButton();
 		parkMap = new ParkMap();
 		parkMap.setParks(parks);
 		
 		final DockLayoutPanel dock = new DockLayoutPanel(Unit.PX);
-		MapWidget mapWidget = parkMap.getWidget(this);
-		dock.addNorth(mapWidget, 500);
-		RootPanel.get("parkfinder").add(dock);
 		
-		parkMap.zoomAndCenter(600, 500);
+		try {
+			MapWidget mapWidget = parkMap.getWidget(this);
+			dock.addNorth(mapWidget, 500);
+			RootPanel.get("parkfinder").add(dock);
+			parkMap.zoomAndCenter(700, 500);
+		}
+		catch(Exception e) {
+			RootPanel.get("parkfinder").add(mapFailedToLoadText);
+		}
 	}
 	
 	/** Reload the (already initialized) map with a given list of parks.
@@ -434,14 +438,18 @@ public class ParkFinder implements EntryPoint {
 	 */
 	private void reloadMap(Set<LightweightPark> parks) {
 		parkMap.setParks(parks);
-		
 		final DockLayoutPanel dock = new DockLayoutPanel(Unit.PX);
-		MapWidget mapWidget = parkMap.getWidget(this);
-		dock.addNorth(mapWidget, 500);
-		RootPanel.get("parkfinder").add(dock);
 		
-		parkMap.zoomAndCenter(800, 800);
+		try {
+			MapWidget mapWidget = parkMap.getWidget(this);
+			dock.addNorth(mapWidget, 500);
+			RootPanel.get("parkfinder").add(dock);
+			
+			parkMap.zoomAndCenter(700, 500);
+		}
+		catch(Exception e) {
+			RootPanel.get("parkfinder").add(mapFailedToLoadText);
+		}
 	}
-
 }
 

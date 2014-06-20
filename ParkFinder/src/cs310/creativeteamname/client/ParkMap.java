@@ -37,7 +37,7 @@ public class ParkMap {
 	 */
 	protected ParkMap() {
 		map = new MapWidget();
-		map.setSize("800px", "800px");
+		map.setSize("100%", "100%");
 		map.addControl(new LargeMapControl());
 		
 		parks = new TreeSet<LightweightPark>();
@@ -59,9 +59,14 @@ public class ParkMap {
 	 * @param parkFinder the park finder object.
 	 * @return the map of parks, complete with names and locations of the parks that have been assigned.
 	 */
-	public MapWidget getWidget(ParkFinder parkFinder) {
-		this.parkFinder = parkFinder;
-		addParkOverlays();
+	public MapWidget getWidget(ParkFinder parkFinder) throws MapLoadException {
+		try {
+			this.parkFinder = parkFinder;
+			addParkOverlays();
+		}
+		catch(Exception e) {
+			throw new MapLoadException("");
+		}
 		return map;
 	}
 	
