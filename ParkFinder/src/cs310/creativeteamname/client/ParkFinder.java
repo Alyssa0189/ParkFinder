@@ -401,6 +401,7 @@ public class ParkFinder implements EntryPoint {
 			public void onClick(ClickEvent event) {
 				addComment(parkId);
 				commentInputArea.setText("");
+				loadDetailsPanel(parkId);
 			}
 		});
 
