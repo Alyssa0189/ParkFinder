@@ -25,7 +25,9 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import cs310.creativeteamname.client.DataVancouverService;
 import cs310.creativeteamname.shared.Park;
 public class DataVancouverServiceImpl extends RemoteServiceServlet implements DataVancouverService{
-	private static final String dataSource = "ftp://webftp.vancouver.ca/opendata/xml/parks_facilities.xml";
+	//private static final String dataSource = "ftp://webftp.vancouver.ca/opendata/xml/parks_facilities.xml";
+	private static final String dataSource = "https://gist.githubusercontent.com/mcracker/9da2bb2e0702b4011a65/raw/e8b27cb2935df6d52a5c6cbcd333a42a40484a9c/parkXML";
+	private static final String csvSource = "https://gist.githubusercontent.com/mcracker/fa82ca097e6820228ea3/raw/d68a98a78b1ce2bc24851e57012ce3e61115f546/parkImages";
 	private static final String zipSource = "ftp://webftp.vancouver.ca/opendata/csv/csv_parks_facilities.zip";
 	private static final String PARK_IMAGES_FILE_NAME = "park_images.csv";
 	private static final Logger logger = Logger.getLogger("logger"); // how many times can you type logger before it looks weird?
@@ -46,11 +48,25 @@ public class DataVancouverServiceImpl extends RemoteServiceServlet implements Da
 		} catch (IOException e) {
 			return;
 		}
-		parseImageData(parks);
+		parseImageDataRaw(parks);
+		//parseImageData(parks);
 		save(parks);
 		//LocationServiceImpl.setParks(parks);
 	}
-	
+	private void parseImageDataRaw(HashMap<Integer, Park> parks){
+		String url = csvSource;
+		URL obj;
+		try {
+			obj = new URL(url);
+			URLConnection con = obj.openConnection();
+			InputStream stream = con.getInputStream();
+	        CsvStreamReader.addImagesWithLibrary(stream, parks);
+	        		
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	private void parseImageData(HashMap<Integer, Park> parks){
 		String url = zipSource;
 		URL obj;
