@@ -342,6 +342,7 @@ public class ParkFinder implements EntryPoint {
 		submitButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				addComment(parkId);
+				commentInputArea.setText("");
 			}
 		});
 
@@ -416,6 +417,9 @@ public class ParkFinder implements EntryPoint {
 	 * @param parks the parks that will be displayed on the map.
 	 */
 	private void loadMap(Set<LightweightPark> parks) {
+		RootPanel.get("admin").clear();
+		addRefreshButton();
+		addRetrieveButton();
 		parkMap = new ParkMap();
 		parkMap.setParks(parks);
 		
@@ -437,6 +441,9 @@ public class ParkFinder implements EntryPoint {
 	 * @param parks the parks that will be displayed on the map.
 	 */
 	private void reloadMap(Set<LightweightPark> parks) {
+		RootPanel.get("admin").clear();
+		addRefreshButton();
+		addRetrieveButton();
 		parkMap.setParks(parks);
 		final DockLayoutPanel dock = new DockLayoutPanel(Unit.PX);
 		
