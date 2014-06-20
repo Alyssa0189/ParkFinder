@@ -34,6 +34,8 @@ public class LightweightPark implements Comparable {
 		
 		LatLng location = other.getLocation();
 		this.location = LatLng.newInstance(location.getLatitude(), location.getLongitude());
+		
+		this.name = other.getName();
 	}
 	
 	/** Create a new lightweight park from a normal park.
@@ -121,4 +123,3 @@ public class LightweightPark implements Comparable {
 		
 	}
 }
-

@@ -37,7 +37,7 @@ public class ParkMap {
 	 */
 	protected ParkMap() {
 		map = new MapWidget();
-		map.setSize("100%", "100%");
+		map.setSize("800px", "800px");
 		map.addControl(new LargeMapControl());
 		
 		parks = new TreeSet<LightweightPark>();
@@ -119,7 +119,9 @@ public class ParkMap {
 				LightweightPark p = currentPark;
 				
 				public void onClick(MarkerClickEvent event) {
+					RootPanel.get("parkfinder").clear();
 					displayParkDetails(p);
+					map.savePosition();
 				}
 			});
 		}
@@ -131,7 +133,6 @@ public class ParkMap {
 	 */
 	private void displayParkDetails(LightweightPark park) {
 		this.parkFinder.loadDetailsPanel(park.getId());
-		System.out.println("Display park id: " + park.getId() + " with name " + park.getName());
 	}
 	
 	/** Get the marker options for a park's icon.
@@ -151,4 +152,3 @@ public class ParkMap {
 	}
 	
 }
-

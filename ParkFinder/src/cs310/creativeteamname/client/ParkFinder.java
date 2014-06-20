@@ -14,6 +14,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -62,6 +63,8 @@ public class ParkFinder implements EntryPoint {
 	private final LocationServiceAsync locationService = GWT.create(LocationService.class);
 	private static final int CHARACTER_LIMIT = 250;
 	private static final String VANCOUVER_URL = "http://vancouver.ca";
+	private Set<LightweightPark> parksOnMap;
+	private ParkMap parkMap;
 
 	/**
 	 * This is the entry point method.
@@ -114,7 +117,7 @@ public class ParkFinder implements EntryPoint {
 		backToMapButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				RootPanel.get("parkfinder").clear();
-				// TODO load map panel
+				reloadMap(parksOnMap);
 			}
 		});
 
@@ -168,8 +171,8 @@ public class ParkFinder implements EntryPoint {
 					@Override
 					public void onSuccess(HashMap<Integer, Park> result) {
 						allParks = result;
-						Set<LightweightPark> parks = getLightParksFromHeavy(result);
-						loadMap(parks);
+						parksOnMap = getLightParksFromHeavy(result);
+						loadMap(parksOnMap);
 					}
 				});
 			}
@@ -361,6 +364,12 @@ public class ParkFinder implements EntryPoint {
 		Window.alert(error.getMessage());
 	}	
 	
+
+	/** Convert a hash map of Parks to a set of LightweightParks.
+	 * 
+	 * @param heavyParks the set of Parks
+	 * @return the set of converted lightweight parks
+	 */
 	private Set<LightweightPark> getLightParksFromHeavy(HashMap<Integer, Park> heavyParks) {
 		Set<LightweightPark> lightParks = new TreeSet<LightweightPark>();
 		
@@ -372,15 +381,36 @@ public class ParkFinder implements EntryPoint {
 		return lightParks;
 	}
 	
+	/** Load the map with a given list of parks.
+	 * 
+	 * @param parks the parks that will be displayed on the map.
+	 */
 	private void loadMap(Set<LightweightPark> parks) {
-		ParkMap map = new ParkMap();
-		map.setParks(parks);
+		parkMap = new ParkMap();
+		parkMap.setParks(parks);
 		
 		final DockLayoutPanel dock = new DockLayoutPanel(Unit.PX);
-		dock.addNorth(map.getWidget(this), 500);
-		RootPanel.get("maparea").add(dock);
+		MapWidget mapWidget = parkMap.getWidget(this);
+		dock.addNorth(mapWidget, 500);
+		RootPanel.get("parkfinder").add(dock);
 		
-		map.zoomAndCenter(600, 500);
+		parkMap.zoomAndCenter(600, 500);
+	}
+	
+	/** Reload the (already initialized) map with a given list of parks.
+	 * 
+	 * @param parks the parks that will be displayed on the map.
+	 */
+	private void reloadMap(Set<LightweightPark> parks) {
+		parkMap.setParks(parks);
+		
+		final DockLayoutPanel dock = new DockLayoutPanel(Unit.PX);
+		MapWidget mapWidget = parkMap.getWidget(this);
+		dock.addNorth(mapWidget, 500);
+		RootPanel.get("parkfinder").add(dock);
+		
+		parkMap.zoomAndCenter(800, 800);
 	}
 
 }
+
