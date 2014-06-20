@@ -2,6 +2,8 @@ package cs310.creativeteamname.client;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
@@ -50,7 +52,8 @@ public class ParkFinder implements EntryPoint {
 	private FlexTable commentFlexTable = new FlexTable();
 	private Button addNewCommentButton = new Button("Add your comment");
 	private DetailsServiceAsync detailsService = GWT.create(DetailsService.class);	
-
+	private Button showAllCommentsButton = new Button("Show all comments");
+		
 	private VerticalPanel commentPanel = new VerticalPanel();
 	private TextArea commentInputArea = new TextArea();
 	private Label commentHereLabel = new Label(
@@ -110,7 +113,13 @@ public class ParkFinder implements EntryPoint {
 		
 		Park park = allParks.get(parkId);
 		displayDetails(park);
-		getComments(parkId);
+		List<Comment> comments = new LinkedList<Comment>();
+		Logger logger = Logger.getLogger("logger");
+		
+		getComments(parkId, false);
+		logger.severe("and trying to print " + comments.size() + " comments");
+		
+		
 
 		// Assemble details panel.
 		detailsPanel.add(detailsLabel);
@@ -121,6 +130,8 @@ public class ParkFinder implements EntryPoint {
 		detailsPanel.add(noCommentsLabel);
 		detailsPanel.add(commentFlexTable);
 		detailsPanel.add(addNewCommentButton);
+		detailsPanel.add(showAllCommentsButton);
+		
 
 		// Associate details panel with HTML page.
 		RootPanel.get("parkfinder").add(detailsPanel);
@@ -148,7 +159,28 @@ public class ParkFinder implements EntryPoint {
 				loadCommentPanel(parkId);
 			}
 		});
-	}
+	
+		
+	
+	// List for mouse events on the showAllCommentsButton button.
+	 showAllCommentsButton.addClickHandler(new ClickHandler() {
+		 public void onClick(ClickEvent event) {
+	 commentService.getComment(parkId, new AsyncCallback<Comment[]>() {
+	 @Override
+	 public void onFailure(Throwable caught) {
+	 handleError(caught);
+	 }
+	
+	 @Override
+	 public void onSuccess(Comment[] result) {
+	 getComments(parkId, true);
+	 }
+	 
+	 });
+		 }});
+	 }
+
+
 
 	private void addRefreshButton() {
 		refreshDataButton = new Button("Refresh data set");
@@ -283,22 +315,33 @@ public class ParkFinder implements EntryPoint {
 		return str;
 	}
 
-	private void getComments(int parkId) {
+	private void getComments(int parkId, final boolean displayAll) {
 		commentService.getComment(parkId, new AsyncCallback<Comment[]>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				handleError(caught);				
+				handleError(caught);
+				
 			}
 
 			@Override
 			public void onSuccess(Comment[] result) {
-				displayComments(result);
+				Logger logger = Logger.getLogger("logger");
+				logger.severe("found " + result.length + " comments");
+				
+				//returnAllResult(result);
+				if(displayAll){
+					displayAllComments(result);
+				}else{
+					displayThreeComments(result);
+				}
 				
 			}
 		});
+		
 	}
-	
-	private void displayComments(Comment[] comments) {
+		
+			
+	private void displayAllComments(Comment[] comments) {
 		commentFlexTable.removeAllRows();
 		int i = 0;
 		if(comments.length != 0) {
@@ -311,6 +354,21 @@ public class ParkFinder implements EntryPoint {
 			noCommentsLabel.setVisible(true);
 		}
 	}
+	
+	private void displayThreeComments(Comment[] comments) {
+		int i = 0;
+		if (comments.length != 0) {
+			for (Comment comment : comments) {
+				if (i < 3) {
+					commentFlexTable.setText(i, 1, comment.getInput());
+				}
+				i++;
+			}
+		} else
+			noCommentsLabel.setText("No comments for this park.");
+	}
+
+
 
 	private void loadCommentPanel(final int parkId) {
 		// Move cursor focus to the input box
