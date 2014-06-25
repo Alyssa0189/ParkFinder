@@ -20,6 +20,7 @@ import com.google.gwt.maps.client.geom.Size;
 import com.google.gwt.maps.client.overlay.Icon;
 import com.google.gwt.maps.client.overlay.Marker;
 import com.google.gwt.maps.client.overlay.MarkerOptions;
+import com.google.gwt.maps.client.overlay.Overlay;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 
@@ -29,7 +30,6 @@ public class ParkMap {
 	private Set<LightweightPark> parks;
 	private MapZoomer zoomer;
 	private VancouverBounds vancouverBounds;
-	private LightweightPark currentPark;
 	ParkFinder parkFinder;
 	
 	/** Create a park map without any parks.
@@ -108,52 +108,11 @@ public class ParkMap {
 	 * 
 	 */
 	private void addParkOverlays() {
-		MarkerOptions options;
-				
+
 		for(LightweightPark park : parks) {
-			options = getMarkerOptions(park);
-			options.setTitle(park.getName());
-			Marker parkMarker = new Marker(park.getLocation(), options);
-
-			map.addOverlay(parkMarker);
-
-			LightweightPark p1 = new LightweightPark(park);
-			this.currentPark = p1;
-
-			parkMarker.addMarkerClickHandler(new MarkerClickHandler() {
-				LightweightPark p = currentPark;
-				
-				public void onClick(MarkerClickEvent event) {
-					RootPanel.get("parkfinder").clear();
-					displayParkDetails(p);
-					map.savePosition();
-				}
-			});
+			ParkOverlay parkOverlay = new ParkOverlay(park, parkFinder);
+			map.addOverlay(parkOverlay.getOverlay());
 		}
-	}
-	
-	/** Display the details for a particular park.
-	 * 
-	 * @param id the id of the park to display.
-	 */
-	private void displayParkDetails(LightweightPark park) {
-		this.parkFinder.loadDetailsPanel(park.getId());
-	}
-	
-	/** Get the marker options for a park's icon.
-	 * 
-	 * @return the marker options for the park's icon.
-	 */
-	private MarkerOptions getMarkerOptions(LightweightPark park) {
-		MarkerOptions options = MarkerOptions.newInstance();
-		
-		Icon icon = Icon.newInstance("http://imgur.com/V8dOflq.png");
-		Size iconSize = Size.newInstance(15,16);
-		icon.setIconSize(iconSize);
-		options.setIcon(icon);
-		options.setTitle(park.getName());
-		
-		return options;
 	}
 	
 }
