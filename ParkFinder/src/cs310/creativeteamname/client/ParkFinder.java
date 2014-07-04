@@ -154,6 +154,7 @@ public class ParkFinder implements EntryPoint {
 		detailsPanel = new VerticalPanel();
 		addNewCommentButton = new Button("Add your comment");
 		backToMapButton = new Button("Back to map");
+		
 		// Create table for park details.
 		detailsFlexTable.setText(0, 0, "Park name:");
 		detailsFlexTable.setText(1, 0, "Street address:");
@@ -169,9 +170,7 @@ public class ParkFinder implements EntryPoint {
 		Logger logger = Logger.getLogger("logger");
 		
 		getComments(parkId, false);
-		logger.severe("and trying to print " + comments.size() + " comments");
-		
-		
+		logger.severe("and trying to print " + comments.size() + " comments");		
 
 		// Assemble details panel.
 		detailsPanel.add(detailsLabel);
@@ -182,8 +181,7 @@ public class ParkFinder implements EntryPoint {
 		detailsPanel.add(noCommentsLabel);
 		detailsPanel.add(commentFlexTable);
 		detailsPanel.add(addNewCommentButton);
-		detailsPanel.add(showAllCommentsButton);
-		
+		detailsPanel.add(showAllCommentsButton);		
 
 		// Associate details panel with HTML page.
 		RootPanel.get("parkfinder").add(detailsPanel);
@@ -210,30 +208,31 @@ public class ParkFinder implements EntryPoint {
 				RootPanel.get("parkfinder").clear();
 				loadCommentPanel(parkId);
 			}
+		});		
+	
+		// List for mouse events on the showAllCommentsButton button.
+		showAllCommentsButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				commentService.getComment(parkId, new AsyncCallback<Comment[]>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						handleError(caught);
+					}
+
+					@Override
+					public void onSuccess(Comment[] result) {
+						getComments(parkId, true);
+					}
+
+				});
+			}
 		});
-	
-		
-	
-	// List for mouse events on the showAllCommentsButton button.
-	 showAllCommentsButton.addClickHandler(new ClickHandler() {
-		 public void onClick(ClickEvent event) {
-	 commentService.getComment(parkId, new AsyncCallback<Comment[]>() {
-	 @Override
-	 public void onFailure(Throwable caught) {
-	 handleError(caught);
-	 }
-	
-	 @Override
-	 public void onSuccess(Comment[] result) {
-	 getComments(parkId, true);
-	 }
-	 
-	 });
-		 }});
-	 }
+	}
 
-
-
+	/**
+	 * Add button that refreshes the data set.
+	 * 
+	 */
 	private void addRefreshButton() {
 		refreshDataButton = new Button("Refresh data set");
 		refreshDataButton.addClickHandler(new ClickHandler() {
@@ -425,8 +424,6 @@ public class ParkFinder implements EntryPoint {
 			noCommentsLabel.setVisible(true);
 		
 	}
-
-
 
 	private void loadCommentPanel(final int parkId) {
 		// Move cursor focus to the input box
