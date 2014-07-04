@@ -1,4 +1,4 @@
-/** A lightweight park with only a name and location, used for the map.
+/** A lightweight park with only a name, id, location and address.
  * 
  */
 
@@ -13,16 +13,18 @@ public class LightweightPark implements Comparable {
 	int id;
 	LatLng location;
 	String name;
+	String address;
 	
 	/** Create a new park with an id, location and name.
 	 * 
 	 * @param location the park's location.
 	 * @param name the park's name.
 	 */
-	public LightweightPark(int id, LatLng location, String name) {
+	public LightweightPark(int id, LatLng location, String name, String address) {
 		this.id = id;
 		this.location = location;
 		this.name = name;
+		this.address = address;
 	}
 	
 	/** Create a new lightweight park from an existing lightweight park.
@@ -36,6 +38,8 @@ public class LightweightPark implements Comparable {
 		this.location = LatLng.newInstance(location.getLatitude(), location.getLongitude());
 		
 		this.name = other.getName();
+		
+		this.address = other.getAddress();
 	}
 	
 	/** Create a new lightweight park from a normal park.
@@ -49,8 +53,11 @@ public class LightweightPark implements Comparable {
 		double longitude = heavyPark.getLon().doubleValue();
 		this.location = LatLng.newInstance(latitude, longitude);
 		
-		
 		this.name = heavyPark.getName();
+		
+		String streetNumber = heavyPark.getStreetNumber();
+		String streetName = heavyPark.getStreetName();
+		this.address = streetNumber + " " + streetName;
 	}
 	
 	/** Get the id of the park.
@@ -77,49 +84,40 @@ public class LightweightPark implements Comparable {
 		return name;
 	}
 	
+	/** Get the address of the park.
+	 * 
+	 * @return the park's address.
+	 */
+	public String getAddress() {
+		return address;
+	}
+	
 	/** Determine whether or not this park is equal to another park.
 	 * 
 	 * @param other the other park.
-	 * @return true if the two parks have the same name and location.
+	 * @return true if the two parks have the same id.
 	 */
-	public boolean equals(LightweightPark other) {
-		return (name.equals(other.getName()) && location.equals(other.getLocation()));
+	@Override
+	public boolean equals(Object other) {
+		LightweightPark otherPark = (LightweightPark)other;
+		return (otherPark.getId() == id);
 	}
 	
 	/** Get the hash code for this park.
 	 * 
 	 * @return the hash code.
 	 */
+	@Override
 	public int hashCode() {
-		int locationHash = location.hashCode();
-		int nameHash = name.hashCode();
-		return locationHash + (7 * nameHash);
+		return id;
 	}
-
+	
+	/** Compare this park to another park.
+	 * 
+	 */
 	@Override
 	public int compareTo(Object other) {
 		LightweightPark otherPark = (LightweightPark)other;
-		
-		if(this.equals(other))
-			return 0;
-		
-		int nameCompare = this.name.compareTo(otherPark.getName());
-		
-		if(nameCompare != 0)
-			return nameCompare;
-		
-		double thisLat = this.getLocation().getLatitude();
-		double thisLon = this.getLocation().getLongitude();
-		double otherLat = otherPark.getLocation().getLatitude();
-		double otherLon = otherPark.getLocation().getLongitude();
-			
-		if(thisLat < otherLat)
-			return -1;
-		if(thisLat > otherLat)
-			return 1;
-		if(thisLon < otherLon)
-			return -1;
-		return 1;
-		
+		return id - otherPark.getId();
 	}
 }
