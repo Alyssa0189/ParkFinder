@@ -401,7 +401,7 @@ public class ParkFinder implements EntryPoint {
 		if(comments.length != 0) {
 			noCommentsLabel.setVisible(false);
 			for(Comment comment : comments) {
-				commentFlexTable.setText(i, 1, comment.getInput());
+				commentFlexTable.setText(i, 1, comment.getUser() + " says: " + comment.getInput());
 				i++;
 			}
 		} else {
@@ -417,7 +417,7 @@ public class ParkFinder implements EntryPoint {
 			noCommentsLabel.setVisible(false);
 			for (Comment comment : comments) {
 				if (i < 3) {
-					commentFlexTable.setText(i, 1, comment.getInput());
+					commentFlexTable.setText(i, 1, comment.getUser() + " says: " + comment.getInput());
 				}
 				i++;
 			}
@@ -484,6 +484,7 @@ public class ParkFinder implements EntryPoint {
 	private void addComment(int parkId) {
 		final String input = commentInputArea.getText().trim();
 		Comment comment = new Comment();
+		comment.setUser(loginInfo.getNickname());
 		comment.setInput(input);
 		comment.setParkId(parkId);
 

@@ -18,6 +18,8 @@ public class Comment implements Serializable {
 	@Persistent
 	private int parkId;
 	@Persistent
+	private String user;
+	@Persistent
 	private String input;
 	@Persistent
 	private long createTime;
@@ -38,6 +40,14 @@ public class Comment implements Serializable {
 		this.parkId = parkId;
 	}
 	
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
 	public String getInput() {
 		return input;
 	}
