@@ -8,7 +8,7 @@ import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.shared.GWT;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -18,6 +18,7 @@ import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlexTable;
@@ -29,6 +30,7 @@ import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 import cs310.creativeteamname.shared.Comment;
+import cs310.creativeteamname.shared.LoginInfo;
 import cs310.creativeteamname.shared.Park;
 
 /**
@@ -59,24 +61,74 @@ public class ParkFinder implements EntryPoint {
 			"Please add your comment in the textbox below (maximum characters allowed: 250)");
 	private Button submitButton = new Button("Submit");
 	private Button cancelButton = new Button("Cancel");
+	
 	private final CommentServiceAsync commentService = GWT
 			.create(CommentService.class);
 	private final DataVancouverServiceAsync dataVancouverService = GWT.create(DataVancouverService.class);
 	private final LocationServiceAsync locationService = GWT.create(LocationService.class);
+	
 	private static final int CHARACTER_LIMIT = 250;
 	private static final String VANCOUVER_URL = "http://vancouver.ca";
+	
 	private Set<LightweightPark> parksOnMap;
 	private ParkMap parkMap;
 	private Label mapFailedToLoadText = new Label("The map failed to load!");
+	
+	private LoginInfo loginInfo = new LoginInfo();
+	private VerticalPanel loginPanel = new VerticalPanel();
+	private Label loginLabel = new Label("Please sign in to your Google account.");
+	private Anchor signInLink = new Anchor("Sign In");
+	private Anchor signOutLink = new Anchor("Sign Out");
 
 	/**
 	 * This is the entry point method.
 	 */	
 	public void onModuleLoad() {
-		addRefreshButton();
-		addRetrieveButton();
-		locationService.getAllParks(new AsyncCallback<HashMap<Integer, Park>>() {
+		// Check login status using login service.
+		LoginServiceAsync loginService = GWT.create(LoginService.class);
+		loginService.login(GWT.getHostPageBaseURL(), new AsyncCallback<LoginInfo>() {
+					public void onFailure(Throwable error) {
+						handleError(error);
+					}
 
+					public void onSuccess(LoginInfo result) {
+						loginInfo = result;
+						if (loginInfo.isLoggedIn()) {
+							loadParkFinder();
+						} else {
+							loadLogin();
+						}
+					}
+				});
+	}
+	
+	/**
+	 * Load the login panel.
+	 * 
+	 */
+	private void loadLogin() {
+		// Assemble login panel.
+		signInLink.setHref(loginInfo.getLoginUrl());
+		loginPanel = new VerticalPanel();
+		loginPanel.add(loginLabel);
+		loginPanel.add(signInLink);
+		RootPanel.get("login").add(loginPanel);
+	}
+	
+	/**
+	 * Load the park finder application.
+	 * 
+	 */
+	private void loadParkFinder() {
+		// Set up sign out hyperlink.
+		RootPanel.get("login").clear();
+		signOutLink.setHref(loginInfo.getLogoutUrl());
+		loginPanel = new VerticalPanel();
+		loginPanel.add(signOutLink);
+		RootPanel.get("login").add(loginPanel);
+		
+		// Call location service.
+		locationService.getAllParks(new AsyncCallback<HashMap<Integer, Park>>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				// TODO Auto-generated method stub
@@ -206,10 +258,12 @@ public class ParkFinder implements EntryPoint {
 		});
 		RootPanel.get("admin").add(refreshDataButton);
 	}
+	
 	/**
-	 * For test purposes only!  Author: DJMCCOOL (Dan)
+	 * Add button that reloads the map.
+	 * 
 	 */
-	private void addRetrieveButton() {
+	private void addReloadButton() {
 		retrieveDataButton = new Button("Refresh map");
 		retrieveDataButton.addClickHandler(new ClickHandler() {
 
@@ -480,9 +534,7 @@ public class ParkFinder implements EntryPoint {
 	 * @param parks the parks that will be displayed on the map.
 	 */
 	private void loadMap(Set<LightweightPark> parks) {
-		RootPanel.get("admin").clear();
-		addRefreshButton();
-		addRetrieveButton();
+		loadAdminButtons();
 		parkMap = new ParkMap();
 		parkMap.setParks(parks);
 		
@@ -504,9 +556,7 @@ public class ParkFinder implements EntryPoint {
 	 * @param parks the parks that will be displayed on the map.
 	 */
 	private void reloadMap(Set<LightweightPark> parks) {
-		RootPanel.get("admin").clear();
-		addRefreshButton();
-		addRetrieveButton();
+		loadAdminButtons();
 		parkMap.setParks(parks);
 		final DockLayoutPanel dock = new DockLayoutPanel(Unit.PX);
 		
@@ -521,5 +571,18 @@ public class ParkFinder implements EntryPoint {
 			RootPanel.get("parkfinder").add(mapFailedToLoadText);
 		}
 	}
+	
+	/**
+	 * Load the buttons in the admin div.
+	 * 
+	 */
+	private void loadAdminButtons() {
+		RootPanel.get("admin").clear();
+		if(loginInfo.isAdmin()) {
+			addRefreshButton();
+		}
+		addReloadButton();
+	}
+	
 }
 
