@@ -24,6 +24,7 @@ public class FeatureList {
 	public FeatureList(String title) {
 		this.title = title;
 		Label titleLabel = new Label(title);
+		panelForDisplay = new VerticalPanel();
 		panelForDisplay.add(titleLabel);
 		featureOptions = new TreeSet<FeatureOption>();
 	}
@@ -41,9 +42,17 @@ public class FeatureList {
 	 * 
 	 * @return the feature option panel.
 	 */
-	public VerticalPanel getFeatureList() {
+	public VerticalPanel getWidget() {
 		addFeaturesToPanel();
 		return panelForDisplay;
+	}
+	
+	/** Determine the number of features in this list.
+	 * 
+	 * @return the number of features.
+	 */
+	public int getNumFeatures() {
+		return featureOptions.size();
 	}
 	
 	/** Add the features in the list to the panel.

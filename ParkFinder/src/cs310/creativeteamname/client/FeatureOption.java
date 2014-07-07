@@ -24,6 +24,7 @@ public class FeatureOption implements Comparable {
 		this.featureName = featureName;
 		featureCheckbox = new CheckBox(featureName);
 		featureCheckbox.setValue(false);
+		featurePanel = new HorizontalPanel();
 		featurePanel.add(featureCheckbox);
 		addClickHandler();
 	}

@@ -54,6 +54,9 @@ public class ParkFinder implements EntryPoint {
 	private Button addNewCommentButton = new Button("Add your comment");
 	private DetailsServiceAsync detailsService = GWT.create(DetailsService.class);	
 	private Button showAllCommentsButton = new Button("Show all comments");
+	
+	private Button backFromFilterButton = new Button("Back to parks");
+	private Button filterButton = new Button("Filter parks");
 		
 	private VerticalPanel commentPanel = new VerticalPanel();
 	private TextArea commentInputArea = new TextArea();
@@ -79,6 +82,8 @@ public class ParkFinder implements EntryPoint {
 	private Label loginLabel = new Label("Please sign in to your Google account.");
 	private Anchor signInLink = new Anchor("Sign In");
 	private Anchor signOutLink = new Anchor("Sign Out");
+	
+	private boolean onMapView = true;
 
 	/**
 	 * This is the entry point method.
@@ -139,6 +144,7 @@ public class ParkFinder implements EntryPoint {
 				allParks = result;
 				parksOnMap = getLightParksFromHeavy(result);
 				loadMap(parksOnMap);
+				loadFilterButton();
 			}
 		});
 	}
@@ -582,5 +588,81 @@ public class ParkFinder implements EntryPoint {
 		addReloadButton();
 	}
 	
+	/** Set up the filter button.
+	 * 
+	 */
+	private void loadFilterButton() {
+		RootPanel.get("comments").add(filterButton);
+		
+		filterButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				RootPanel.get("parkfinder").clear();
+				loadFilterPage();
+			}
+		});
+	}
+	
+	/** Load the filter page.
+	 * 
+	 */
+	private void loadFilterPage() {
+		RootPanel.get("admin").clear();
+		
+		FlexTable filterTable = createFilterTable().getWidget();
+		
+		RootPanel.get("parkfinder").add(filterTable);
+		RootPanel.get("comments").add(backFromFilterButton);
+		
+		// Listen for mouse events on the Back button.
+		backFromFilterButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				RootPanel.get("parkfinder").clear();
+				if(onMapView)
+					reloadMap(parksOnMap);
+				else {
+					// Load list view
+				}
+			}
+		});
+	}
+	
+	/** Create a filter table with all of the feature items.
+	 * 
+	 * @return the filter table with all feature items added.
+	 */
+	private FilterTable createFilterTable() {
+		FilterTable filterTable = new FilterTable();
+		
+		String[] sportsFields = {"Baseball Diamonds","Bowling Greens","Cricket Pitches","Field Hockey","Football Fields","Rugby Fields","Soccer Fields","Ultimate Fields"};
+		
+		String[] sportsOther = {"Ball Hockey", "Basketball Courts","Disc Golf Courses","Golf Courses","Horseshoe Pitch","Lacrosse Boxes","Outdoor Roller Hockey Rinks","Rinks","Running Tracks","Skateboard Parks","Softball","Sport Court","Swimming Pools","Tennis Courts"};
+
+		String[] buildings = {"Community Centers","Community Halls","Field Houses","Food Confessions","Restaurants","Washrooms"};
+
+		String[] walkingAndExercise = {"Dog Off-Leash Areas","Exercise Stations","Jogging Trails","Perimeter Walking Path","Senior's Wellness Circuit"};
+		
+		String[] generalFeatures = {"Beaches","Designated Wedding Ceremony Site","Hellenic Garden","Lighted Fields","Picnic Benches","Picnic Sites","Playgrounds","Seawall","Water/Spray Parks","Wading Pool"};
+		
+		addFeaturesToTable("Sports - Fields", sportsFields, filterTable);
+		addFeaturesToTable("Sports - Other", sportsOther, filterTable);
+		addFeaturesToTable("Buildings", buildings, filterTable);
+		addFeaturesToTable("Walking and Exercise", walkingAndExercise, filterTable);
+		addFeaturesToTable("General Features", generalFeatures, filterTable);
+		
+		return filterTable;
+	}
+	
+	/** Adds one category of features to a given table.
+	 * 
+	 */
+	private void addFeaturesToTable(String title, String[] features, FilterTable table) {
+		FeatureList featureList = new FeatureList(title);
+		
+		for(String feature : features) {
+			featureList.addFeatureOption(feature);
+		}
+		
+		table.addFeatureList(featureList);
+	}
 }
 
