@@ -84,6 +84,7 @@ public class ParkFinder implements EntryPoint {
 	private Anchor signOutLink = new Anchor("Sign Out");
 	
 	private boolean onMapView = true;
+	private ParkFilter filter;
 
 	/**
 	 * This is the entry point method.
@@ -143,8 +144,8 @@ public class ParkFinder implements EntryPoint {
 			public void onSuccess(HashMap<Integer, Park> result) {
 				allParks = result;
 				parksOnMap = getLightParksFromHeavy(result);
-				loadMap(parksOnMap);
-				loadFilterButton();
+				loadParkFilter(result);
+				loadMap();
 			}
 		});
 	}
@@ -156,6 +157,7 @@ public class ParkFinder implements EntryPoint {
 	 */
 	public void loadDetailsPanel(final int parkId) {
 		RootPanel.get("admin").clear();
+		RootPanel.get("buttons").clear();
 		RootPanel.get("comments").clear();
 		detailsPanel = new VerticalPanel();
 		addNewCommentButton = new Button("Add your comment");
@@ -204,7 +206,7 @@ public class ParkFinder implements EntryPoint {
 		backToMapButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				RootPanel.get("parkfinder").clear();
-				reloadMap(parksOnMap);
+				reloadMap();
 			}
 		});
 
@@ -256,7 +258,7 @@ public class ParkFinder implements EntryPoint {
 					public void onSuccess(Void result) {
 						Logger logger = Logger.getLogger("");
 						logger.severe("Successfully loaded data set - probably");
-						Window.alert("Successfully loaded data set - yay!");;
+						Window.alert("Successfully loaded data set - yay!");
 					}
 				});
 			}
@@ -284,8 +286,7 @@ public class ParkFinder implements EntryPoint {
 					@Override
 					public void onSuccess(HashMap<Integer, Park> result) {
 						allParks = result;
-						parksOnMap = getLightParksFromHeavy(result);
-						loadMap(parksOnMap);
+						loadMap();
 					}
 				});
 			}
@@ -533,35 +534,43 @@ public class ParkFinder implements EntryPoint {
 		return lightParks;
 	}
 	
+	/** Convert a hash map of Parks to a set of LightweightParks.
+	 * 
+	 * @param heavyParks the set of Parks
+	 * @return the set of converted lightweight parks
+	 */
+	private Set<LightweightPark> getLightParksFromHeavy(Set<Park> heavyParks) {
+		Set<LightweightPark> lightParks = new TreeSet<LightweightPark>();
+		
+		for(Park heavyPark : heavyParks) {
+			LightweightPark lightPark = new LightweightPark(heavyPark);
+			lightParks.add(lightPark);
+		}
+		
+		return lightParks;
+	}
+	
 	/** Load the map with a given list of parks.
 	 * 
 	 * @param parks the parks that will be displayed on the map.
 	 */
-	private void loadMap(Set<LightweightPark> parks) {
-		loadAdminButtons();
+	private void loadMap() {
 		parkMap = new ParkMap();
-		parkMap.setParks(parks);
-		
-		final DockLayoutPanel dock = new DockLayoutPanel(Unit.PX);
-		
-		try {
-			MapWidget mapWidget = parkMap.getWidget(this);
-			dock.addNorth(mapWidget, 500);
-			RootPanel.get("parkfinder").add(dock);
-			parkMap.zoomAndCenter(700, 500);
-		}
-		catch(Exception e) {
-			RootPanel.get("parkfinder").add(mapFailedToLoadText);
-		}
+		reloadMap();
 	}
 	
 	/** Reload the (already initialized) map with a given list of parks.
 	 * 
 	 * @param parks the parks that will be displayed on the map.
 	 */
-	private void reloadMap(Set<LightweightPark> parks) {
+	private void reloadMap() {
 		loadAdminButtons();
-		parkMap.setParks(parks);
+		loadFilterButton();
+		
+		Set<Park> filteredParks = filter.getFilteredParks();
+		Set<LightweightPark> filteredParksLight = getLightParksFromHeavy(filteredParks);
+		parkMap.setParks(filteredParksLight);
+		
 		final DockLayoutPanel dock = new DockLayoutPanel(Unit.PX);
 		
 		try {
@@ -592,11 +601,13 @@ public class ParkFinder implements EntryPoint {
 	 * 
 	 */
 	private void loadFilterButton() {
-		RootPanel.get("comments").add(filterButton);
+		
+		RootPanel.get("buttons").clear();
+		RootPanel.get("buttons").add(filterButton);
 		
 		filterButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				RootPanel.get("parkfinder").clear();
+				RootPanel.get("buttons").clear();
 				loadFilterPage();
 			}
 		});
@@ -606,7 +617,8 @@ public class ParkFinder implements EntryPoint {
 	 * 
 	 */
 	private void loadFilterPage() {
-		RootPanel.get("admin").clear();
+		clearAllDivs();
+		RootPanel.get("buttons").add(backFromFilterButton);
 		
 		FlexTable filterTable = createFilterTable().getWidget();
 		
@@ -616,9 +628,10 @@ public class ParkFinder implements EntryPoint {
 		// Listen for mouse events on the Back button.
 		backFromFilterButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				RootPanel.get("parkfinder").clear();
+				clearAllDivs();
+				
 				if(onMapView)
-					reloadMap(parksOnMap);
+					reloadMap();
 				else {
 					// Load list view
 				}
@@ -663,6 +676,28 @@ public class ParkFinder implements EntryPoint {
 		}
 		
 		table.addFeatureList(featureList);
+	}
+	
+	/** Set up the park filter object.
+	 * 
+	 * @param parks the parks to set the filter object up with.
+	 * 
+	 */
+	private void loadParkFilter(HashMap<Integer, Park> parks) {
+		Set<Park> resultingParks = new TreeSet<Park>();
+		
+		for(Park park : parks.values()) {
+			resultingParks.add(park);
+		}
+		
+		filter = ParkFilter.getInstance(resultingParks);
+	}
+	
+	private void clearAllDivs() {
+		RootPanel.get("admin").clear();
+		RootPanel.get("buttons").clear();
+		RootPanel.get("parkfinder").clear();
+		RootPanel.get("comments").clear();
 	}
 }
 

@@ -14,13 +14,14 @@ public class FeatureOption implements Comparable {
 	String featureName;
 	CheckBox featureCheckbox;
 	HorizontalPanel featurePanel;
-	boolean isSelected;
+	ParkFilter filter;
 	
 	/** Create a new feature option with a given feature.
 	 * 
 	 * @param feature the feature's name.
 	 */
 	public FeatureOption(String featureName) {
+		filter = ParkFilter.getInstance(null);
 		this.featureName = featureName;
 		featureCheckbox = new CheckBox(featureName);
 		featureCheckbox.setValue(false);
@@ -54,17 +55,12 @@ public class FeatureOption implements Comparable {
 			@Override
 			public void onClick(ClickEvent event) {
 				boolean checked = ((CheckBox) event.getSource()).getValue();
-				setChecked(checked);
+				if(checked)
+					filter.filterBy(featureName);
+				else
+					filter.undoFilterBy(featureName);
 			}
 		});
-	}
-	
-	/** Set the checked status for this feature.
-	 * 
-	 * @param checked whether or not the box is checked.
-	 */
-	private void setChecked(boolean checked) {
-		this.isSelected = checked;
 	}
 	
 	@Override

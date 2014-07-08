@@ -14,7 +14,7 @@ import javax.jdo.annotations.PrimaryKey;
  *
  */
 @PersistenceCapable(identityType = IdentityType.APPLICATION)
-public class Park implements Serializable {
+public class Park implements Serializable, Comparable {
 	
 	@PrimaryKey
 	@Persistent(valueStrategy = IdGeneratorStrategy.IDENTITY)
@@ -187,4 +187,17 @@ public class Park implements Serializable {
 		this.imageUrl = imageUrl;
 	}
 	
+	public int compareTo(Object other) {
+		Park otherPark = (Park)other;
+		return this.parkId - otherPark.getParkId();
+	}
+	
+	public boolean equals(Object other) {
+		Park otherPark = (Park)other;
+		return (this.parkId == otherPark.getParkId());
+	}
+	
+	public int hashCode() {
+		return this.parkId;
+	}
 }
