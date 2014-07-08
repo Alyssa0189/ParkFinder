@@ -37,12 +37,12 @@ import cs310.creativeteamname.shared.Park;
  * Entry point classes define <code>onModuleLoad()</code>.
  */
 public class ParkFinder implements EntryPoint {
-	//Dan's button
+	// Dan's button
 	private Button refreshDataButton = new Button("Refresh data set");
 	private Button retrieveDataButton = new Button("Refresh map");
-	
-	private HashMap<Integer, Park> allParks = new HashMap<Integer, Park>(); 
-	
+
+	private HashMap<Integer, Park> allParks = new HashMap<Integer, Park>();
+
 	private VerticalPanel detailsPanel = new VerticalPanel();
 	private Label detailsLabel = new Label("Park Details");
 	private Image detailsImage = new Image();
@@ -52,7 +52,8 @@ public class ParkFinder implements EntryPoint {
 	private Label noCommentsLabel = new Label("No comments for this park.");
 	private FlexTable commentFlexTable = new FlexTable();
 	private Button addNewCommentButton = new Button("Add your comment");
-	private DetailsServiceAsync detailsService = GWT.create(DetailsService.class);	
+	private DetailsServiceAsync detailsService = GWT
+			.create(DetailsService.class);
 	private Button showAllCommentsButton = new Button("Show all comments");
 	
 	private Button backFromFilterButton = new Button("Back to parks");
@@ -67,15 +68,22 @@ public class ParkFinder implements EntryPoint {
 	
 	private final CommentServiceAsync commentService = GWT
 			.create(CommentService.class);
-	private final DataVancouverServiceAsync dataVancouverService = GWT.create(DataVancouverService.class);
-	private final LocationServiceAsync locationService = GWT.create(LocationService.class);
+	private final DataVancouverServiceAsync dataVancouverService = GWT
+			.create(DataVancouverService.class);
 	
+	private final LocationServiceAsync locationService = GWT
+			.create(LocationService.class);
 	private static final int CHARACTER_LIMIT = 250;
 	private static final String VANCOUVER_URL = "http://vancouver.ca";
 	
 	private Set<LightweightPark> parksOnMap;
+	private TreeSet<LightweightPark> parksList;
 	private ParkMap parkMap;
 	private Label mapFailedToLoadText = new Label("The map failed to load!");
+	private Button parkListButton = new Button("View Park List");
+	private FlexTable parkListFlexTable = new FlexTable();
+	private Button goToDetailPage=new Button("View Park's Details");
+	private Button mapButton = new Button("Back to map");
 	
 	private LoginInfo loginInfo = new LoginInfo();
 	private VerticalPanel loginPanel = new VerticalPanel();
@@ -88,14 +96,14 @@ public class ParkFinder implements EntryPoint {
 
 	/**
 	 * This is the entry point method.
-	 */	
+	 */
 	public void onModuleLoad() {
 		// Check login status using login service.
 		LoginServiceAsync loginService = GWT.create(LoginService.class);
 		loginService.login(GWT.getHostPageBaseURL(), new AsyncCallback<LoginInfo>() {
-					public void onFailure(Throwable error) {
-						handleError(error);
-					}
+			public void onFailure(Throwable error) {
+				handleError(error);
+			}
 
 					public void onSuccess(LoginInfo result) {
 						loginInfo = result;
@@ -135,25 +143,27 @@ public class ParkFinder implements EntryPoint {
 		
 		// Call location service.
 		locationService.getAllParks(new AsyncCallback<HashMap<Integer, Park>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				// TODO Auto-generated method stub
-			}
+					@Override
+					public void onFailure(Throwable caught) {
+						// TODO Auto-generated method stub
+					}
 
-			@Override
-			public void onSuccess(HashMap<Integer, Park> result) {
-				allParks = result;
-				parksOnMap = getLightParksFromHeavy(result);
+					@Override
+					public void onSuccess(HashMap<Integer, Park> result) {
+						allParks = result;
+						parksOnMap = getLightParksFromHeavy(result);
+						loadMap(parksOnMap);
 				loadParkFilter(result);
 				loadMap();
-			}
-		});
-	}
-	
-	/** 
+					}
+				});
+		}
+
+	/**
 	 * Load the park details panel.
 	 * 
-	 * @param parkId the park's id.
+	 * @param parkId
+	 *            the park's id.
 	 */
 	public void loadDetailsPanel(final int parkId) {
 		RootPanel.get("admin").clear();
@@ -171,12 +181,12 @@ public class ParkFinder implements EntryPoint {
 		detailsFlexTable.setText(4, 0, "Facilities:");
 		detailsFlexTable.setText(5, 0, "Special features:");
 		detailsFlexTable.setText(6, 0, "Washrooms:");
-		
+
 		Park park = allParks.get(parkId);
 		displayDetails(park);
 		List<Comment> comments = new LinkedList<Comment>();
 		Logger logger = Logger.getLogger("logger");
-		
+
 		getComments(parkId, false);
 		logger.severe("and trying to print " + comments.size() + " comments");		
 
@@ -201,13 +211,13 @@ public class ParkFinder implements EntryPoint {
 		detailsFlexTable.addStyleName("detailsTable");
 		commentsLabel.addStyleName("detailsLabel");
 		mapFailedToLoadText.addStyleName("mapLoadFailLabel");
-		
+
 		// Listen for mouse events on the Back button.
 		backToMapButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				clearAllDivs();
 				reloadMap();
-			}
+				}
 		});
 
 		// Listen for mouse events on the Add button.
@@ -217,7 +227,7 @@ public class ParkFinder implements EntryPoint {
 				loadCommentPanel(parkId);
 			}
 		});		
-	
+
 		// List for mouse events on the showAllCommentsButton button.
 		showAllCommentsButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
@@ -236,7 +246,7 @@ public class ParkFinder implements EntryPoint {
 			}
 		});
 	}
-
+		
 	/**
 	 * Add button that refreshes the data set.
 	 * 
@@ -259,6 +269,7 @@ public class ParkFinder implements EntryPoint {
 						Logger logger = Logger.getLogger("");
 						logger.severe("Successfully loaded data set - probably");
 						Window.alert("Successfully loaded data set - yay!");
+						;
 					}
 				});
 			}
@@ -267,7 +278,23 @@ public class ParkFinder implements EntryPoint {
 	}
 	
 	/**
-	 * Add button that reloads the map.
+	 * Displays page with list of parks' names and their addresses
+	 */
+	private void addParkListButton() {
+		parkListButton = new Button("View Park List");
+		parkListButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				loadListPanel();
+				displayParkList();
+			}
+		});
+		RootPanel.get("parkfinder").add(parkListButton);
+		
+	}
+
+	/**
+	 * For test purposes only! Author: DJMCCOOL (Dan)
 	 * 
 	 */
 	private void addReloadButton() {
@@ -276,28 +303,32 @@ public class ParkFinder implements EntryPoint {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				locationService.getAllParks(new AsyncCallback<HashMap<Integer, Park>>() {
+				locationService
+						.getAllParks(new AsyncCallback<HashMap<Integer, Park>>() {
 
-					@Override
-					public void onFailure(Throwable caught) {
-						// TODO Auto-generated method stub
-					}
+							@Override
+							public void onFailure(Throwable caught) {
+								// TODO Auto-generated method stub
+							}
 
-					@Override
-					public void onSuccess(HashMap<Integer, Park> result) {
-						allParks = result;
-						loadMap();
-					}
-				});
+							@Override
+							public void onSuccess(HashMap<Integer, Park> result) {
+								allParks = result;
+								parksOnMap = getLightParksFromHeavy(result);
+								loadMap(parksOnMap);
+							}
+						});
 			}
 		});
 		RootPanel.get("admin").add(retrieveDataButton);
+		
 	}
-	
-	/** 
+
+	/**
 	 * Get park details from the server.
 	 * 
-	 * @param parkId the park's id.
+	 * @param parkId
+	 *            the park's id.
 	 */
 	private void getParkDetails(int parkId) {
 		class DetailCallBack implements AsyncCallback<Park> {
@@ -314,62 +345,73 @@ public class ParkFinder implements EntryPoint {
 
 		detailsService.getParkDetails(parkId, new DetailCallBack());
 	}
-	
+
 	/**
 	 * Display a park's details in the details panel.
 	 * 
-	 * @param park the park.
+	 * @param park
+	 *            the park.
 	 */
 	private void displayDetails(Park park) {
-		if(park.getImageUrl() == null) {
+		if (park.getImageUrl() == null) {
 			detailsImage.setUrl("images/no_image_available.png");
-		} else detailsImage.setUrl(VANCOUVER_URL + park.getImageUrl());
-		
+		} else
+			detailsImage.setUrl(VANCOUVER_URL + park.getImageUrl());
+
 		detailsFlexTable.setText(0, 1, park.getName());
-		
-		String streetAddress = park.getStreetNumber() + " " + park.getStreetName();		
+
+		String streetAddress = park.getStreetNumber() + " "
+				+ park.getStreetName();
 		detailsFlexTable.setText(1, 1, streetAddress);
-		
-		detailsFlexTable.setText(2, 1, park.getNeighbourhoodName());		
+
+		detailsFlexTable.setText(2, 1, park.getNeighbourhoodName());
 		detailsFlexTable.setText(3, 1, park.getNeighbourhoodURL());
-		
-		if(park.getFacilities().length==0) {
+
+		if (park.getFacilities().length == 0) {
 			detailsFlexTable.setText(4, 1, "N/A");
-		} else detailsFlexTable.setText(4, 1, convertArrayToString(park.getFacilities()));
-		
-		if(park.getSpecialFeatures().length==0) {
+		} else
+			detailsFlexTable.setText(4, 1,
+					convertArrayToString(park.getFacilities()));
+
+		if (park.getSpecialFeatures().length == 0) {
 			detailsFlexTable.setText(5, 1, "N/A");
-		} else detailsFlexTable.setText(5, 1, convertArrayToString(park.getSpecialFeatures()));
-		
+		} else
+			detailsFlexTable.setText(5, 1,
+					convertArrayToString(park.getSpecialFeatures()));
+
 		detailsFlexTable.setText(6, 1, convertBooleanToStr(park.isWashroom()));
 	}
-	
-	/** 
+
+	/**
 	 * Convert an array of strings to a delimited string.
 	 * 
-	 * @param strings an array of strings.
+	 * @param strings
+	 *            an array of strings.
 	 * @return a delimited string.
 	 * 
-	 * @see http://stackoverflow.com/questions/6244823/convert-liststring-to-delimited-string
+	 * @see http
+	 *      ://stackoverflow.com/questions/6244823/convert-liststring-to-delimited
+	 *      -string
 	 */
 	private String convertArrayToString(String[] strings) {
 		StringBuilder sb = new StringBuilder();
-		for(String s : strings) {
+		for (String s : strings) {
 			sb.append(s).append(", ");
 		}
-		sb.deleteCharAt(sb.length()-2); // delete last space and comma
+		sb.deleteCharAt(sb.length() - 2); // delete last space and comma
 		return sb.toString();
 	}
-	
+
 	/**
 	 * Convert a boolean to a yes/no string.
 	 * 
-	 * @param bool a boolean value.
+	 * @param bool
+	 *            a boolean value.
 	 * @return 'yes' string if bool is true, 'no' string if bool is false.
 	 */
 	private String convertBooleanToStr(boolean bool) {
 		String str = "no";
-		if(bool) {
+		if (bool) {
 			str = "yes";
 		}
 		return str;
@@ -380,42 +422,41 @@ public class ParkFinder implements EntryPoint {
 			@Override
 			public void onFailure(Throwable caught) {
 				handleError(caught);
-				
+
 			}
 
 			@Override
 			public void onSuccess(Comment[] result) {
 				Logger logger = Logger.getLogger("logger");
 				logger.severe("found " + result.length + " comments");
-				
-				//returnAllResult(result);
-				if(displayAll){
+
+				// returnAllResult(result);
+				if (displayAll) {
 					displayAllComments(result);
-				}else{
+				} else {
 					displayThreeComments(result);
 				}
-				
+
 			}
 		});
-		
+
 	}
-		
-			
+
 	private void displayAllComments(Comment[] comments) {
 		commentFlexTable.removeAllRows();
 		int i = 0;
-		if(comments.length != 0) {
+		if (comments.length != 0) {
 			noCommentsLabel.setVisible(false);
-			for(Comment comment : comments) {
+			for (Comment comment : comments) {
 				commentFlexTable.setText(i, 1, comment.getUser() + " says: " + comment.getInput());
 				i++;
 			}
 		} else {
 			noCommentsLabel.setVisible(true);
-			
+
 		}
 	}
-	
+
 	private void displayThreeComments(Comment[] comments) {
 		commentFlexTable.removeAllRows();
 		int i = 0;
@@ -429,7 +470,7 @@ public class ParkFinder implements EntryPoint {
 			}
 		} else
 			noCommentsLabel.setVisible(true);
-		
+
 	}
 
 	private void loadCommentPanel(final int parkId) {
@@ -440,21 +481,22 @@ public class ParkFinder implements EntryPoint {
 		// Reference used:
 		// http://stackoverflow.com/questions/6980908/maxlength-for-gwt-textarea
 		commentInputArea.getElement().setAttribute("maxlength", "250");
-		
+
 		// Assemble comment panel
 		commentPanel = new VerticalPanel();
 		commentPanel.setSpacing(10);
-		commentPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+		commentPanel
+				.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		commentPanel.setSize("500", "500");
 		commentPanel.add(commentHereLabel);
 		commentPanel.add(commentInputArea);
-		
-		//Buttons
+
+		// Buttons
 		submitButton = new Button("Submit");
 		cancelButton = new Button("Cancel");
 		commentPanel.add(cancelButton);
 		commentPanel.add(submitButton);
-		
+
 		RootPanel.get("comments").clear();
 		RootPanel.get("comments").add(commentPanel);
 
@@ -492,18 +534,19 @@ public class ParkFinder implements EntryPoint {
 		comment.setInput(input);
 		comment.setParkId(parkId);
 
-		if((!input.isEmpty()) && (input.length() < CHARACTER_LIMIT)) {
+		if ((!input.isEmpty()) && (input.length() < CHARACTER_LIMIT)) {
 			addComment(comment, parkId);
-		} else Window.alert("Please input a comment.");
+		} else
+			Window.alert("Please input a comment.");
 	}
-	
+
 	private void addComment(Comment comment, final int parkId) {
 		commentService.addComment(comment, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable error) {
 				handleError(error);
 			}
-			
+
 			@Override
 			public void onSuccess(Void ignore) {
 				RootPanel.get("parkfinder").clear();
@@ -515,37 +558,42 @@ public class ParkFinder implements EntryPoint {
 
 	private void handleError(Throwable error) {
 		Window.alert(error.getMessage());
-	}	
-	
+	}
 
-	/** Convert a hash map of Parks to a set of LightweightParks.
+	/**
+	 * Convert a hash map of Parks to a set of LightweightParks.
 	 * 
-	 * @param heavyParks the set of Parks
+	 * @param heavyParks
+	 *            the set of Parks
 	 * @return the set of converted lightweight parks
 	 */
-	private Set<LightweightPark> getLightParksFromHeavy(HashMap<Integer, Park> heavyParks) {
+	private Set<LightweightPark> getLightParksFromHeavy(
+			HashMap<Integer, Park> heavyParks) {
 		Set<LightweightPark> lightParks = new TreeSet<LightweightPark>();
-		
-		for(Park heavyPark : heavyParks.values()) {
+
+		for (Park heavyPark : heavyParks.values()) {
 			LightweightPark lightPark = new LightweightPark(heavyPark);
 			lightParks.add(lightPark);
 		}
-		
+
 		return lightParks;
 	}
-	
+
 	/** Convert a hash map of Parks to a set of LightweightParks.
+	 * Load the map with a given list of parks.
 	 * 
 	 * @param heavyParks the set of Parks
 	 * @return the set of converted lightweight parks
+	 * @param parks
+	 *            the parks that will be displayed on the map.
 	 */
 	private Set<LightweightPark> getLightParksFromHeavy(Set<Park> heavyParks) {
 		Set<LightweightPark> lightParks = new TreeSet<LightweightPark>();
-		
+
 		for(Park heavyPark : heavyParks) {
 			LightweightPark lightPark = new LightweightPark(heavyPark);
 			lightParks.add(lightPark);
-		}
+		} catch (Exception e) {
 		
 		return lightParks;
 	}
@@ -558,29 +606,30 @@ public class ParkFinder implements EntryPoint {
 		parkMap = new ParkMap();
 		reloadMap();
 	}
-	
-	/** Reload the (already initialized) map with a given list of parks.
+
+	/**
+	 * Reload the (already initialized) map with a given list of parks.
 	 * 
-	 * @param parks the parks that will be displayed on the map.
+	 * @param parks
+	 *            the parks that will be displayed on the map.
 	 */
 	private void reloadMap() {
 		loadAdminButtons();
-		loadFilterButton();
+		
 		
 		Set<Park> filteredParks = filter.getFilteredParks();
 		Set<LightweightPark> filteredParksLight = getLightParksFromHeavy(filteredParks);
 		parkMap.setParks(filteredParksLight);
 		
 		final DockLayoutPanel dock = new DockLayoutPanel(Unit.PX);
-		
+
 		try {
 			MapWidget mapWidget = parkMap.getWidget(this);
 			dock.addNorth(mapWidget, 500);
 			RootPanel.get("parkfinder").add(dock);
-			
+
 			parkMap.zoomAndCenter(700, 500);
-		}
-		catch(Exception e) {
+		} catch (Exception e) {
 			RootPanel.get("parkfinder").add(mapFailedToLoadText);
 		}
 	}
@@ -595,6 +644,7 @@ public class ParkFinder implements EntryPoint {
 			addRefreshButton();
 		}
 		addReloadButton();
+		addParkListButton();
 	}
 	
 	/** Set up the filter button.
@@ -635,6 +685,8 @@ public class ParkFinder implements EntryPoint {
 					loadMap();
 				else {
 					// Load list view
+					loadListPanel();
+					displayParkList();
 				}
 			}
 		});
@@ -700,5 +752,90 @@ public class ParkFinder implements EntryPoint {
 		RootPanel.get("parkfinder").clear();
 		RootPanel.get("comments").clear();
 	}
-}
+
+	/**
+	 * Park List Panel
+	 */
+	private void loadListPanel() {
+		parkListFlexTable.setText(0, 0, "Park name & Address");
+		RootPanel.get("admin").clear();
+		RootPanel.get("parkfinder").clear();
+		RootPanel.get("comments").clear();
+		RootPanel.get("parkfinder").add(mapButton);
+		RootPanel.get("parkfinder").add(parkListFlexTable);
+		mapButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				RootPanel.get("parkfinder").clear();
+				reloadMap(parksOnMap);
+			}
+		});
+		
+	}
+
+	/**
+	 * Obtains list of parks from db
+	 */
+	private void displayParkList() {
+		locationService
+				.getAllParks(new AsyncCallback<HashMap<Integer, Park>>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						handleError(caught);
+					}
+
+					@Override
+					public void onSuccess(HashMap<Integer, Park> result) {
+						allParks = result;
+						parksList = (TreeSet<LightweightPark>) getLightParksFromHeavy(result);
+						loadParkList(parksList);
+					}
+				});
+		}
+	
+	
+			
+
+	/**
+	 * Adds name and address to flextable 
+	 * Go to details page for the park selected in the table
+	 * @param parks
+	 */
+	private void loadParkList(Set<LightweightPark> parks) {
+		TreeSet<String> parkNames = new TreeSet<String>();
+			combineNamAddrId(parks, parkNames);
+			int i=1;
+			String s;
+			for (String n : parkNames) {
+				parkListFlexTable.setText(i, 0, n.substring(0, n.indexOf("#")));
+				s= n.substring(n.lastIndexOf("#") + 1);
+				final Integer id=Integer.valueOf(s);
+				goToDetailPage = new Button("View Park's Details");
+				parkListFlexTable.setWidget(i, 1, goToDetailPage);
+				
+				goToDetailPage.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+					RootPanel.get("parkfinder").clear();
+					loadDetailsPanel(id);
+					}
+				});
+								
+				i++;
+			}
+		}
+	
+	
+	
+	/**
+	 * @param parks
+	 * @param names
+	 * @return alphabetically arranged set where each element consists of name, address and id of a park
+	 */
+	private TreeSet<String> combineNamAddrId(Set<LightweightPark> parks, TreeSet<String> names) {
+		for (LightweightPark p: parks){
+			names.add(p.getName() + " Address: " + p.getAddress() + " #" + p.getId());	
+			}
+		return names;
+		}
+	}
 
