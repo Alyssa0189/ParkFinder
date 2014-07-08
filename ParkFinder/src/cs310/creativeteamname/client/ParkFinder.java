@@ -205,7 +205,7 @@ public class ParkFinder implements EntryPoint {
 		// Listen for mouse events on the Back button.
 		backToMapButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				RootPanel.get("parkfinder").clear();
+				clearAllDivs();
 				reloadMap();
 			}
 		});
@@ -618,6 +618,7 @@ public class ParkFinder implements EntryPoint {
 	 */
 	private void loadFilterPage() {
 		clearAllDivs();
+		filter.removeAllFilters();
 		RootPanel.get("buttons").add(backFromFilterButton);
 		
 		FlexTable filterTable = createFilterTable().getWidget();
@@ -631,7 +632,7 @@ public class ParkFinder implements EntryPoint {
 				clearAllDivs();
 				
 				if(onMapView)
-					reloadMap();
+					loadMap();
 				else {
 					// Load list view
 				}
@@ -652,7 +653,7 @@ public class ParkFinder implements EntryPoint {
 
 		String[] buildings = {"Community Centers","Community Halls","Field Houses","Food Confessions","Restaurants","Washrooms"};
 
-		String[] walkingAndExercise = {"Dog Off-Leash Areas","Exercise Stations","Jogging Trails","Perimeter Walking Path","Senior's Wellness Circuit"};
+		String[] walkingAndExercise = {"Dogs Off-Leash Areas","Exercise Stations","Jogging Trails","Perimeter Walking Path","Senior's Wellness Circuit"};
 		
 		String[] generalFeatures = {"Beaches","Designated Wedding Ceremony Site","Hellenic Garden","Lighted Fields","Picnic Benches","Picnic Sites","Playgrounds","Seawall","Water/Spray Parks","Wading Pool"};
 		

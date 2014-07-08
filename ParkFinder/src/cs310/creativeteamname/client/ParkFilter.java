@@ -59,6 +59,9 @@ public class ParkFilter {
 		for(String feature : features)
 			filterBy(feature);
 		
+		
+		System.out.println("Filtering by some features: " + features[0] + " ... ");
+		printFilteredParks();
 		return filteredParks.size();
 	}
 	
@@ -76,7 +79,12 @@ public class ParkFilter {
 				parksTemp.add(park);
 		
 		filteredParks = parksTemp;
+		System.out.println("Filtering by " + feature);
+		printFilteredParks();
 		return filteredParks.size();
+		
+		
+		
 	}
 	
 	/** Undo the result of filtering out a particular feature.
@@ -93,7 +101,17 @@ public class ParkFilter {
 				parksTemp.add(park);
 
 		filteredParks = new TreeSet<Park>(parksTemp);
+		
+		System.out.println("Filtering by " + feature);
+		printFilteredParks();
 		return filteredParks.size();
+	}
+	
+	/** Remove all filters.
+	 * 
+	 */
+	public void removeAllFilters() {
+		filteredParks = new TreeSet<Park>(allParks);
 	}
 	
 	/** Determine whether or not a given park has all the given features.
@@ -117,25 +135,41 @@ public class ParkFilter {
 	 * @return true if the park has the given feature.
 	 */
 	private boolean hasFeature(Park park, String feature) {
-		if(feature.equals("Washrooms"))
-			return true;
 		
-		String[] facilities = park.getFacilities();
-		String[] specialFeatures = park.getSpecialFeatures();
-		
-		return contains(facilities, feature) || contains(specialFeatures, feature);
+		Set<String> parkFeatures = getFeaturesOfPark(park);
+		return parkFeatures.contains(feature);
 	}
 	
-	/** Determine whether or not a given feature is in a list of features.
+	/** Get a list of all features for a given park.
 	 * 
-	 * @param features the list of features.
-	 * @return true if the feature is in the list of features.
+	 * @param park the park to find the features of.
+	 * @return all features of the park.
 	 */
-	private boolean contains(String[] features, String feature) {
-		for(int i = 0; i < features.length; i++)
-			if(features[i].equals(feature))
-				return true;
+	private Set<String> getFeaturesOfPark(Park park) {
+		Set<String> parkFeatures = new TreeSet<String>();
 		
-		return false;
+		if(park.isWashroom())
+			parkFeatures.add("Washrooms");
+		
+		for(String facility : park.getFacilities())
+			parkFeatures.add(facility);
+		
+		for(String specialFeature : park.getSpecialFeatures())
+			parkFeatures.add(specialFeature);
+		
+		return parkFeatures;
+	}
+	
+	// Method for testing.
+	private void printFilteredParks() {
+		System.out.println("Filtered parks (" + filteredParks.size() + " parks):");
+		for(Park park : filteredParks) {
+			System.out.print(" " + park.getName());
+		}
+		System.out.println("\n\nFiltering by (" + filteringBy.size() + " filters):");
+		for(String fb : filteringBy) {
+			System.out.print(" " + fb);
+		}
+		System.out.println();
 	}
 }
