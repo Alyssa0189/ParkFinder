@@ -93,6 +93,7 @@ public class ParkFinder implements EntryPoint {
 	private ParkFilter filter;
 	
 	private boolean canAddBackFromFilterButton = true;
+	private Label noParkLbl = new Label("");
 
 	/**
 	 * This is the entry point method.
@@ -805,13 +806,8 @@ public class ParkFinder implements EntryPoint {
 	 * Park List Panel
 	 */
 	private void loadListPanel() {
-		parkListFlexTable.setText(0, 0, "Park name");
-		parkListFlexTable.setText(0, 1, "Address");
-		parkListFlexTable.setText(0, 2, "Details");
-		parkListFlexTable.addStyleName("parklistflextable");
-		parkListFlexTable.getRowFormatter().addStyleName(0, "detailsLabel");
-	
 		RootPanel.get("parkfinder").add(parkListFlexTable);
+		RootPanel.get("parkfinder").add(noParkLbl);
 		
 		// addMapViewButton() (possibly re-add)
 	}
@@ -868,6 +864,13 @@ public class ParkFinder implements EntryPoint {
 			combineNamAddrId(parks, parkNames);
 			int i=1;
 			String s;
+			if (parkNames.isEmpty()==false) {
+				parkListFlexTable.setText(0, 0, "Park name");
+				parkListFlexTable.setText(0, 1, "Address");
+				parkListFlexTable.setText(0, 2, "Details");
+				parkListFlexTable.addStyleName("parklistflextable");
+				parkListFlexTable.getRowFormatter().addStyleName(0, "detailsLabel");
+			
 			for (String n : parkNames) {
 				parkListFlexTable.setText(i, 0, n.substring(0, n.indexOf("Address:")));
 				parkListFlexTable.setText(i, 1, n.substring(n.indexOf(":") + 1, n.indexOf("#")));
@@ -885,7 +888,19 @@ public class ParkFinder implements EntryPoint {
 								
 				i++;
 			}
-		}
+		} else
+				displayNoParks();
+	}
+
+	/**
+	 * display no parks message 
+	 */
+	private void displayNoParks() {
+		{
+			parkListFlexTable.clear();
+			noParkLbl.setText("No locations to display with this filter criteria");
+}
+	}
 
 	/**
 	 * @param parks
