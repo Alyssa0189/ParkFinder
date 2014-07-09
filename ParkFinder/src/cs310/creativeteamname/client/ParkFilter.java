@@ -114,6 +114,15 @@ public class ParkFilter {
 		filteredParks = new TreeSet<Park>(allParks);
 	}
 	
+	/** Determine whether or not a particular filter is being applied.
+	 * 
+	 * @param potentialFilter the filter to check for.
+	 * @return true if the given filter is being applied currently.
+	 */
+	public boolean beingFiltered(String potentialFilter) {
+		return filteringBy.contains(potentialFilter);
+	}
+	
 	/** Determine whether or not a given park has all the given features.
 	 * 
 	 * @param park the park to check.

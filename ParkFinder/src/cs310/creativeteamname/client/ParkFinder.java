@@ -43,13 +43,14 @@ public class ParkFinder implements EntryPoint {
 	private Button backToMapButton = new Button("Back to map");
 	private Button addNewCommentButton = new Button("Add your comment");
 	private Button showAllCommentsButton = new Button("Show all comments");
-	private Button backFromFilterButton = new Button("Back to parks");
 	private Button filterButton = new Button("Filter parks");
 	private Button submitCommentButton = new Button("Submit");
 	private Button cancelCommentButton = new Button("Cancel");
 	private Button parkListButton = new Button("View Park List");
 	private Button goToDetailPage=new Button("View Park's Details");
 	private Button mapButton = new Button("Back to map");
+	
+	private Image backFromFilterImage = new Image();
 
 	private HashMap<Integer, Park> allParks = new HashMap<Integer, Park>();
 
@@ -78,8 +79,6 @@ public class ParkFinder implements EntryPoint {
 	private static final int CHARACTER_LIMIT = 250;
 	private static final String VANCOUVER_URL = "http://vancouver.ca";
 	
-	private Set<LightweightPark> parksOnMap;
-	private TreeSet<LightweightPark> parksList;
 	private ParkMap parkMap;
 	private Label mapFailedToLoadText = new Label("The map failed to load!");;
 	private FlexTable parkListFlexTable = new FlexTable();
@@ -92,6 +91,8 @@ public class ParkFinder implements EntryPoint {
 	
 	private boolean onMapView = true;
 	private ParkFilter filter;
+	
+	private boolean canAddBackFromFilterButton = true;
 
 	/**
 	 * This is the entry point method.
@@ -126,19 +127,26 @@ public class ParkFinder implements EntryPoint {
 	 */
 	private void loadMapPage(boolean reloadParkData) {
 
+	
+		onMapView = true;
+		
 		clearAllDivs();
+		System.out.println("Loading map page!!!!!!!!!!!!!");
 		loadFilterAndViewButtons(true);
 		
 		if(reloadParkData)
 			loadMap();
 		else
 			reloadMap();
+
 	}
 	
 	/** Load the entire list page.
 	 * 
 	 */
 	private void loadListPage() {
+		onMapView = false;
+		
 		clearAllDivs();
 		loadFilterAndViewButtons(false);
 		
@@ -162,21 +170,25 @@ public class ParkFinder implements EntryPoint {
 	private void loadFilterPage() {
 		clearAllDivs();
 		filter.removeAllFilters();
-		RootPanel.get("filterandview").add(backFromFilterButton);
+		backFromFilterImage.getElement().setId("backFromFilterImage");
+		if(canAddBackFromFilterButton) {
+			canAddBackFromFilterButton = false;
+			RootPanel.get("filterandview").add(backFromFilterImage);
+		}
 		
 		FlexTable filterTable = createFilterTable().getWidget();
 		
 		RootPanel.get("parkfinder").add(filterTable);
-		RootPanel.get("comments").add(backFromFilterButton);
+		
+		backFromFilterImage.setUrl("images/backFromFilterImage.png");;
 		
 		// Listen for mouse events on the Back button.
-		backFromFilterButton.addClickHandler(new ClickHandler() {
+		backFromFilterImage.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				if(onMapView)
-					loadMapPage(true);
-				else {
-					loadListPage();
-				}
+					if(onMapView)
+						loadMapPage(true);
+					else
+						loadListPage();
 			}
 		});
 	}
@@ -238,7 +250,6 @@ public class ParkFinder implements EntryPoint {
 					@Override
 					public void onSuccess(HashMap<Integer, Park> result) {
 						allParks = result;
-						parksOnMap = getLightParksFromHeavy(result);
 						loadParkFilter(result);
 						loadMap();
 						loadMapPage(true);
@@ -369,6 +380,7 @@ public class ParkFinder implements EntryPoint {
 		parkListButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				System.out.println("Clicked park list button detected!");
 				loadListPage();
 			}
 		});
@@ -729,6 +741,7 @@ public class ParkFinder implements EntryPoint {
 		
 		filterButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
+				canAddBackFromFilterButton = true;
 				loadFilterPage();
 			}
 		});
@@ -745,7 +758,7 @@ public class ParkFinder implements EntryPoint {
 		
 		String[] sportsOther = {"Ball Hockey", "Basketball Courts","Disc Golf Courses","Golf Courses","Horseshoe Pitch","Lacrosse Boxes","Outdoor Roller Hockey Rinks","Rinks","Running Tracks","Skateboard Parks","Softball","Sport Court","Swimming Pools","Tennis Courts"};
 
-		String[] buildings = {"Community Centers","Community Halls","Field Houses","Food Confessions","Restaurants","Washrooms"};
+		String[] buildings = {"Community Centres","Community Halls","Field Houses","Food Concessions","Restaurants","Washrooms"};
 
 		String[] walkingAndExercise = {"Dogs Off-Leash Areas","Exercise Stations","Jogging Trails","Perimeter Walking Path","Senior's Wellness Circuit"};
 		
@@ -822,6 +835,7 @@ public class ParkFinder implements EntryPoint {
 	private void displayParkList() {
 		Set<Park> filteredParks = filter.getFilteredParks();
 		Set<LightweightPark> parkList = (TreeSet<LightweightPark>) getLightParksFromHeavy(filteredParks);
+		System.out.println("Displaying " + parkList.size() + " filtered parks.");
 		loadParkList(parkList);
 		/*
 		locationService
@@ -865,7 +879,7 @@ public class ParkFinder implements EntryPoint {
 				goToDetailPage.addClickHandler(new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {
-					loadDetailsPage(id);
+						loadDetailsPage(id);
 					}
 				});
 								
