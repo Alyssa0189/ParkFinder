@@ -134,7 +134,7 @@ public class ParkFinder implements EntryPoint {
 
 	
 		onMapView = true;
-		
+				
 		clearAllDivs();
 		System.out.println("Loading map page!!!!!!!!!!!!!");
 		loadFilterAndViewButtons(true);
@@ -151,7 +151,6 @@ public class ParkFinder implements EntryPoint {
 	 */
 	private void loadListPage() {
 		onMapView = false;
-		
 		clearAllDivs();
 		loadFilterAndViewButtons(false);
 		
@@ -274,6 +273,7 @@ public class ParkFinder implements EntryPoint {
 		addNewRatingButton = new Button("Add/modify your rating");
 		addNewCommentButton = new Button("Add your comment");
 		backToMapButton = new Button("Back to map");
+		parkListButton = new Button("View park list");
 		
 		// Create table for park details.
 		detailsFlexTable.setText(0, 0, "Park name:");
@@ -304,6 +304,7 @@ public class ParkFinder implements EntryPoint {
 		detailsPanel.add(detailsImage);
 		detailsPanel.add(detailsFlexTable);
 		detailsPanel.add(backToMapButton);
+		detailsPanel.add(parkListButton);
 		detailsPanel.add(ratingsLabel);
 		detailsPanel.add(ratingsFlexTable);
 		detailsPanel.add(addNewRatingButton);
@@ -311,7 +312,8 @@ public class ParkFinder implements EntryPoint {
 		detailsPanel.add(noCommentsLabel);
 		detailsPanel.add(commentFlexTable);
 		detailsPanel.add(addNewCommentButton);
-		detailsPanel.add(showAllCommentsButton);		
+		detailsPanel.add(showAllCommentsButton);
+		
 
 		// Associate details panel with HTML page.
 		RootPanel.get("parkfinder").add(detailsPanel);
@@ -332,6 +334,16 @@ public class ParkFinder implements EntryPoint {
 			public void onClick(ClickEvent event) {
 				clearAllDivs();
 				loadMapPage(false);
+			}
+		});
+		
+		// Listen for mouse events on the parkList button.
+		parkListButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				clearAllDivs();
+				loadListPage();
+				
 			}
 		});
 		
@@ -365,6 +377,8 @@ public class ParkFinder implements EntryPoint {
 					}
 
 				});
+				
+				
 			}
 		});
 	}
