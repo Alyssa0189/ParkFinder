@@ -23,8 +23,10 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DockLayoutPanel;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -43,11 +45,12 @@ public class ParkFinder implements EntryPoint {
 	private Button backToMapButton = new Button("Back to map");
 	private Button addNewCommentButton = new Button("Add your comment");
 	private Button showAllCommentsButton = new Button("Show all comments");
+	private Button addNewRatingButton = new Button("Add/modify your rating");
 	private Button filterButton = new Button("Filter parks");
 	private Button submitCommentButton = new Button("Submit");
 	private Button cancelCommentButton = new Button("Cancel");
-	private Button parkListButton = new Button("View Park List");
-	private Button goToDetailPage=new Button("View Park's Details");
+	private Button parkListButton = new Button("View park list");
+	private Button goToDetailPage = new Button("View park details");
 	private Button mapButton = new Button("Back to map");
 	
 	private Image backFromFilterImage = new Image();
@@ -58,7 +61,7 @@ public class ParkFinder implements EntryPoint {
 	private Label detailsLabel = new Label("Park Details");
 	private Image detailsImage = new Image();
 	private FlexTable detailsFlexTable = new FlexTable();
-	private Label commentsLabel = new Label("Comments");
+	private Label commentsLabel = new Label("User Comments");
 	private Label noCommentsLabel = new Label("No comments for this park.");
 	private FlexTable commentFlexTable = new FlexTable();
 	private DetailsServiceAsync detailsService = GWT
@@ -73,6 +76,7 @@ public class ParkFinder implements EntryPoint {
 			.create(CommentService.class);
 	private final DataVancouverServiceAsync dataVancouverService = GWT
 			.create(DataVancouverService.class);
+	private final RatingServiceAsync ratingService = GWT.create(RatingService.class);
 	
 	private final LocationServiceAsync locationService = GWT
 			.create(LocationService.class);
@@ -94,6 +98,9 @@ public class ParkFinder implements EntryPoint {
 	
 	private boolean canAddBackFromFilterButton = true;
 	private Label noParkLbl = new Label("");
+	
+	private Label ratingsLabel = new Label("User Ratings");
+	private FlexTable ratingsFlexTable = new FlexTable();
 
 	/**
 	 * This is the entry point method.
@@ -118,7 +125,7 @@ public class ParkFinder implements EntryPoint {
 				});
 	}
 	
-	// The following 4 methods should do all the work for loading a page,
+	// The following 5 methods should do all the work for loading a page,
 	// including getting rid of the previous pages.
 	
 	/** Load the entire map page.
@@ -165,6 +172,17 @@ public class ParkFinder implements EntryPoint {
 		loadDetailsPanel(id);
 	}
 	
+	/** 
+	 * Load the entire add rating page for a park.
+	 * 
+	 * @param id the id of the park to load the add rating page.
+	 * 
+	 */
+	private void loadAddRatingPage(int id) {
+		clearAllDivs();
+		loadAddRatingPanel(id);
+	}
+	
 	/** Load the entire filter page.
 	 * 
 	 */
@@ -192,15 +210,7 @@ public class ParkFinder implements EntryPoint {
 						loadListPage();
 			}
 		});
-	}
-	
-	
-	
-	
-	
-	
-	
-	
+	}	
 	
 	/** Load the filter and map/list view buttons.
 	 * 
@@ -261,11 +271,11 @@ public class ParkFinder implements EntryPoint {
 	/**
 	 * Load the park details panel.
 	 * 
-	 * @param parkId
-	 *            the park's id.
+	 * @param parkId the park's id.
 	 */
 	public void loadDetailsPanel(final int parkId) {
 		detailsPanel = new VerticalPanel();
+		addNewRatingButton = new Button("Add/modify your rating");
 		addNewCommentButton = new Button("Add your comment");
 		backToMapButton = new Button("Back to map");
 		
@@ -282,15 +292,25 @@ public class ParkFinder implements EntryPoint {
 		displayDetails(park);
 		List<Comment> comments = new LinkedList<Comment>();
 		Logger logger = Logger.getLogger("logger");
+		
+		// Create table for user ratings.
+		ratingsFlexTable.setText(0, 0, "Average rating:");
+		ratingsFlexTable.setText(1, 0, "Your rating:");
+		
+		getAverageRating(parkId);
+		getUserRating(parkId);
 
 		getComments(parkId, false);
-		logger.severe("and trying to print " + comments.size() + " comments");		
+		logger.severe("and trying to print " + comments.size() + " comments");
 
 		// Assemble details panel.
 		detailsPanel.add(detailsLabel);
 		detailsPanel.add(detailsImage);
 		detailsPanel.add(detailsFlexTable);
 		detailsPanel.add(backToMapButton);
+		detailsPanel.add(ratingsLabel);
+		detailsPanel.add(ratingsFlexTable);
+		detailsPanel.add(addNewRatingButton);
 		detailsPanel.add(commentsLabel);
 		detailsPanel.add(noCommentsLabel);
 		detailsPanel.add(commentFlexTable);
@@ -305,6 +325,9 @@ public class ParkFinder implements EntryPoint {
 		detailsLabel.addStyleName("detailsLabel");
 		detailsFlexTable.getColumnFormatter().addStyleName(0, "detailsColumns");
 		detailsFlexTable.addStyleName("detailsTable");
+		ratingsLabel.addStyleName("detailsLabel");
+		ratingsFlexTable.getColumnFormatter().addStyleName(0, "detailsColumns");
+		ratingsFlexTable.addStyleName("detailsTable");
 		commentsLabel.addStyleName("detailsLabel");
 		mapFailedToLoadText.addStyleName("mapLoadFailLabel");
 
@@ -313,7 +336,14 @@ public class ParkFinder implements EntryPoint {
 			public void onClick(ClickEvent event) {
 				clearAllDivs();
 				loadMapPage(false);
-				}
+			}
+		});
+		
+		// Listen for mouse events on the Rate button.
+		addNewRatingButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				loadAddRatingPage(parkId);
+			}
 		});
 
 		// Listen for mouse events on the Add button.
@@ -389,7 +419,7 @@ public class ParkFinder implements EntryPoint {
 	}
 
 	/**
-	 * For test purposes only! Author: DJMCCOOL (Dan)
+	 * Add button that refreshes the map.
 	 * 
 	 */
 	private void addReloadButton() {
@@ -648,6 +678,117 @@ public class ParkFinder implements EntryPoint {
 			}
 		});
 
+	}
+	
+	/**
+	 * Load the add rating panel.
+	 * 
+	 * @param parkId the park's id.
+	 */
+	public void loadAddRatingPanel(final int parkId) {
+		VerticalPanel ratingPanel = new VerticalPanel();
+		HorizontalPanel buttonPanel = new HorizontalPanel();
+		Label ratingLabel = new Label("Rate this park");
+		Label addRatingLabel = new Label("Add your rating for this park.");
+		Button addRatingButton = new Button("Confirm");
+		Button cancelRatingButton = new Button("Cancel");
+		
+		// Assemble rating listbox.
+		final ListBox ratingBox = new ListBox();
+		ratingBox.addItem("*", "1");
+		ratingBox.addItem("**", "2");
+		ratingBox.addItem("***", "3");
+		ratingBox.addItem("****", "4");
+		ratingBox.addItem("*****", "5");
+		ratingBox.setVisibleItemCount(1);
+		
+		// Assemble rating panel.
+		ratingPanel.add(ratingLabel);
+		ratingPanel.add(addRatingLabel);
+		ratingPanel.add(ratingBox);
+		buttonPanel.add(addRatingButton);
+		buttonPanel.add(cancelRatingButton);
+		ratingPanel.add(buttonPanel);
+		
+		// Associate details panel with HTML page.
+		RootPanel.get("parkfinder").add(ratingPanel);
+		
+		// Add styles to elements in the panel.
+		ratingLabel.addStyleName("detailsLabel");
+		ratingPanel.addStyleName("detailsPanel");
+		
+		// Listen for mouse events on the Confirm button.
+		addRatingButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				int index = ratingBox.getSelectedIndex();
+				addRating(parkId, ratingBox.getValue(index));
+				loadDetailsPage(parkId);
+			}
+		});	
+		
+		// Listen for mouse events on the Cancel button.
+		cancelRatingButton.addClickHandler(new ClickHandler() {
+			public void onClick(ClickEvent event) {
+				loadDetailsPage(parkId);
+			}
+		});	
+	}
+	
+	/**
+	 * Store the user's rating in the datastore.
+	 * 
+	 * @param parkId the park's id.
+	 */
+	private void addRating(int parkId, String userRating) {
+		ratingService.addRating(parkId, userRating, new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				handleError(caught);
+			}
+
+			@Override
+			public void onSuccess(Void result) {
+				//
+			}
+		});
+	}
+
+	/**
+	 * Get the park's average rating from the server.
+	 * 
+	 * @param parkId the park's id.
+	 */
+	private void getAverageRating(int parkId) {
+		ratingService.getAverageRating(parkId, new AsyncCallback<String>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				handleError(caught);
+			}
+
+			@Override
+			public void onSuccess(String averageRating) {
+				ratingsFlexTable.setText(0, 1, averageRating + " (out of 5)");
+			}
+		});
+	}
+	
+	/**
+	 * Get the user's rating for the park from the server.
+	 * 
+	 * @param parkId the park's id.
+	 */
+	private void getUserRating(int parkId) {
+		ratingService.getUserRating(parkId, new AsyncCallback<String>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				handleError(caught);
+			}
+
+			@Override
+			public void onSuccess(String userRating) {
+				ratingsFlexTable.setText(1, 1, userRating + " (out of 5)");
+			}
+		});
 	}
 
 	private void handleError(Throwable error) {
@@ -925,5 +1066,3 @@ public class ParkFinder implements EntryPoint {
 		RootPanel.get("comments").clear();
 	}
 }
-
-
