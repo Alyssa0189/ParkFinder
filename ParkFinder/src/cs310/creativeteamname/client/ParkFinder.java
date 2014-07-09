@@ -152,10 +152,10 @@ public class ParkFinder implements EntryPoint {
 					public void onSuccess(HashMap<Integer, Park> result) {
 						allParks = result;
 						parksOnMap = getLightParksFromHeavy(result);
-						loadParkFilter(result);
-						loadMap();
+						loadMap(parksOnMap);
+				loadParkFilter(result);
+				loadMap();
 					}
-
 				});
 		}
 
@@ -314,9 +314,9 @@ public class ParkFinder implements EntryPoint {
 							@Override
 							public void onSuccess(HashMap<Integer, Park> result) {
 								allParks = result;
-								loadMap();
+								parksOnMap = getLightParksFromHeavy(result);
+								loadMap(parksOnMap);
 							}
-
 						});
 			}
 		});
@@ -589,14 +589,14 @@ public class ParkFinder implements EntryPoint {
 	 */
 	private Set<LightweightPark> getLightParksFromHeavy(Set<Park> heavyParks) {
 		Set<LightweightPark> lightParks = new TreeSet<LightweightPark>();
-		
+
 		for(Park heavyPark : heavyParks) {
 			LightweightPark lightPark = new LightweightPark(heavyPark);
 			lightParks.add(lightPark);
-		}
+		} catch (Exception e) {
+		
 		return lightParks;
 	}
-
 	
 	/** Load the map with a given list of parks.
 	 * 
@@ -651,6 +651,7 @@ public class ParkFinder implements EntryPoint {
 	 * 
 	 */
 	private void loadFilterButton() {
+		
 		RootPanel.get("buttons").clear();
 		RootPanel.get("buttons").add(filterButton);
 		
@@ -756,8 +757,7 @@ public class ParkFinder implements EntryPoint {
 	 * Park List Panel
 	 */
 	private void loadListPanel() {
-		parkListFlexTable.setText(0, 0, "Park name");
-		parkListFlexTable.setText(0, 1, "Address");
+		parkListFlexTable.setText(0, 0, "Park name & Address");
 		RootPanel.get("admin").clear();
 		RootPanel.get("parkfinder").clear();
 		RootPanel.get("comments").clear();
@@ -766,12 +766,12 @@ public class ParkFinder implements EntryPoint {
 		mapButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 				RootPanel.get("parkfinder").clear();
-				reloadMap();
+				reloadMap(parksOnMap);
 			}
 		});
 		
 	}
-	
+
 	/**
 	 * Obtains list of parks from db
 	 */
@@ -806,12 +806,11 @@ public class ParkFinder implements EntryPoint {
 			int i=1;
 			String s;
 			for (String n : parkNames) {
-				parkListFlexTable.setText(i, 0, n.substring(0, n.indexOf("Address:")));
-				parkListFlexTable.setText(i, 1, n.substring(n.indexOf(":") + 1, n.indexOf("#")));
+				parkListFlexTable.setText(i, 0, n.substring(0, n.indexOf("#")));
 				s= n.substring(n.lastIndexOf("#") + 1);
 				final Integer id=Integer.valueOf(s);
 				goToDetailPage = new Button("View Park's Details");
-				parkListFlexTable.setWidget(i, 3, goToDetailPage);
+				parkListFlexTable.setWidget(i, 1, goToDetailPage);
 				
 				goToDetailPage.addClickHandler(new ClickHandler() {
 					@Override
@@ -826,6 +825,7 @@ public class ParkFinder implements EntryPoint {
 		}
 	
 	
+	
 	/**
 	 * @param parks
 	 * @param names
@@ -833,7 +833,7 @@ public class ParkFinder implements EntryPoint {
 	 */
 	private TreeSet<String> combineNamAddrId(Set<LightweightPark> parks, TreeSet<String> names) {
 		for (LightweightPark p: parks){
-			names.add(p.getName() + " Address: " + p.getAddress() + "#" + p.getId());	
+			names.add(p.getName() + " Address: " + p.getAddress() + " #" + p.getId());	
 			}
 		return names;
 		}
