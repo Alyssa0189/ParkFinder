@@ -64,8 +64,6 @@ public class ParkFinder implements EntryPoint {
 	private Label commentsLabel = new Label("User Comments");
 	private Label noCommentsLabel = new Label("No comments for this park.");
 	private FlexTable commentFlexTable = new FlexTable();
-	private DetailsServiceAsync detailsService = GWT
-			.create(DetailsService.class);
 		
 	private VerticalPanel commentPanel = new VerticalPanel();
 	private TextArea commentInputArea = new TextArea();
