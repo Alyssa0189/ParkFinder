@@ -28,16 +28,6 @@
   </servlet-mapping>
   
   <servlet>
-    <servlet-name>detailsService</servlet-name>
-    <servlet-class>cs310.creativeteamname.server.DetailsServiceImpl</servlet-class>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>detailsService</servlet-name>
-    <url-pattern>/parkfinder/detail</url-pattern>
-  </servlet-mapping>
-  
-  <servlet>
     <servlet-name>facebookService</servlet-name>
     <servlet-class>cs310.creativeteamname.server.FacebookServiceImpl</servlet-class>
   </servlet>
