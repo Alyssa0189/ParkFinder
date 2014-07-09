@@ -94,7 +94,6 @@ public class ParkFinder implements EntryPoint {
 	private boolean onMapView = true;
 	private ParkFilter filter;
 	
-	private boolean canAddBackFromFilterButton = true;
 	private Label noParkLbl = new Label("");
 	
 	private Label ratingsLabel = new Label("User Ratings");
@@ -187,11 +186,10 @@ public class ParkFinder implements EntryPoint {
 	private void loadFilterPage() {
 		clearAllDivs();
 		filter.removeAllFilters();
-		backFromFilterImage.getElement().setId("backFromFilterImage");
-		if(canAddBackFromFilterButton) {
-			canAddBackFromFilterButton = false;
-			RootPanel.get("filterandview").add(backFromFilterImage);
-		}
+
+		backFromFilterImage = new Image();
+		
+		RootPanel.get("filterandview").add(backFromFilterImage);
 		
 		FlexTable filterTable = createFilterTable().getWidget();
 		
@@ -405,6 +403,7 @@ public class ParkFinder implements EntryPoint {
 	 * Displays page with list of parks' names and their addresses
 	 */
 	private void addParkListButton() {
+		parkListButton = new Button("View park list");
 		RootPanel.get("filterandview").add(parkListButton);
 		parkListButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -855,11 +854,11 @@ public class ParkFinder implements EntryPoint {
 	 * 
 	 */
 	private void loadFilterButton() {
+		filterButton = new Button("Filter parks");
 		RootPanel.get("filterandview").add(filterButton);
 		
 		filterButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				canAddBackFromFilterButton = true;
 				loadFilterPage();
 			}
 		});
@@ -923,6 +922,8 @@ public class ParkFinder implements EntryPoint {
 	 * Park List Panel
 	 */
 	private void loadListPanel() {
+		parkListFlexTable = new FlexTable(); // Just added for fix, may cause bugs?
+		noParkLbl = new Label("");
 		RootPanel.get("parkfinder").add(parkListFlexTable);
 		RootPanel.get("parkfinder").add(noParkLbl);
 		
@@ -933,6 +934,7 @@ public class ParkFinder implements EntryPoint {
 	 * 
 	 */
 	private void addMapViewButton() {
+		mapButton = new Button("Back to map");
 		RootPanel.get("filterandview").add(mapButton);
 		
 		mapButton.addClickHandler(new ClickHandler() {
