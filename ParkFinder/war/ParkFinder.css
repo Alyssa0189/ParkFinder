@@ -74,3 +74,9 @@ h1 {
 	height:500px;
 	margin:0 auto;
 }
+
+.parklistflextable {
+border: 1px solid silver;
+  padding: 2px;
+  margin-bottom:6px;
+}
