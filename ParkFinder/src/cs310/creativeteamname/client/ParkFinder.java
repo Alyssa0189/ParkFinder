@@ -449,28 +449,6 @@ public class ParkFinder implements EntryPoint {
 	}
 
 	/**
-	 * Get park details from the server.
-	 * 
-	 * @param parkId
-	 *            the park's id.
-	 */
-	private void getParkDetails(int parkId) {
-		class DetailCallBack implements AsyncCallback<Park> {
-			@Override
-			public void onFailure(Throwable error) {
-				handleError(error);
-			}
-
-			@Override
-			public void onSuccess(Park result) {
-				displayDetails(result);
-			}
-		}
-
-		detailsService.getParkDetails(parkId, new DetailCallBack());
-	}
-
-	/**
 	 * Display a park's details in the details panel.
 	 * 
 	 * @param park
