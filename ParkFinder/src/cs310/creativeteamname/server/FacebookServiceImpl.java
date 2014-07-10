@@ -170,11 +170,11 @@ public class FacebookServiceImpl extends RemoteServiceServlet  implements Facebo
 	}
 	private String getUserId(String message){
 		String userId = null;
-		String idKey = "user_id\": ";
+		String idKey = "user_id\":\"";
 		int start = message.indexOf(idKey) + idKey.length();
 		if(start != -1){
 			String substring = message.substring(start);
-			int end = substring.indexOf("}");
+			int end = substring.indexOf("\"");
 			if(end != -1){
 				substring = substring.substring(0, end);
 				userId = substring.trim();
@@ -188,10 +188,11 @@ public class FacebookServiceImpl extends RemoteServiceServlet  implements Facebo
 	}
 	
 	private void postOnWall(String userId, String accessToken) {
-		String url = postURL;
+		String url = postURL + "/";
 		url += userId + "/feed";
 
 		try {
+			logger.severe("url = " + url);
 			URL obj = new URL(url);
 			HttpURLConnection con;
 			con = (HttpURLConnection) obj.openConnection();
@@ -229,8 +230,16 @@ public class FacebookServiceImpl extends RemoteServiceServlet  implements Facebo
 			logger.severe(response.toString());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			logger.severe("encountered error in postOnWall");
-			logger.severe(e.getMessage());
+			logger.severe("encountered " + e.getClass() + " in postOnWall");
+//			StackTraceElement trace[] = e.getStackTrace();
+//			StackTraceElement t;
+//			for(int i = 0; i < trace.length; i++){
+//				t = trace[i];
+//				logger.severe(t.getClassName());
+//				logger.severe(t.getMethodName());
+//				logger.severe("line number = " + t.getLineNumber());
+//			}
+			
 		}
 	}
 	public String logAppOnFacebook(){
