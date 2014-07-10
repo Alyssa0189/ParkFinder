@@ -42,7 +42,7 @@ public class ParkFinder implements EntryPoint {
 	// Buttons
 	private Button refreshDataButton = new Button("Refresh data set");
 	private Button retrieveDataButton = new Button("Refresh map");
-	private Button backToMapButton = new Button("Back to map");
+	private Button backToMapButton = new Button("View park map");
 	private Button addNewCommentButton = new Button("Add your comment");
 	private Button showAllCommentsButton = new Button("Show all comments");
 	private Button addNewRatingButton = new Button("Add/modify your rating");
@@ -66,6 +66,7 @@ public class ParkFinder implements EntryPoint {
 		
 	private VerticalPanel commentPanel = new VerticalPanel();
 	private TextArea commentInputArea = new TextArea();
+	private Label addCommentLabel = new Label("Add your comment");
 	private Label commentHereLabel = new Label(
 			"Please add your comment in the textbox below (maximum characters allowed: 250)");
 	
@@ -139,7 +140,7 @@ public class ParkFinder implements EntryPoint {
 		});
 	}
 	
-	// The following 5 methods should do all the work for loading a page,
+	// The following 6 methods should do all the work for loading a page,
 	// including getting rid of the previous pages.
 	
 	/** Load the entire map page.
@@ -147,15 +148,10 @@ public class ParkFinder implements EntryPoint {
 	 * @param reloadData true if the park data should be retrieved again.
 	 * 
 	 */
-	private void loadMapPage(boolean reloadParkData) {
-
-	
-		onMapView = true;
-				
+	private void loadMapPage(boolean reloadParkData) {	
+		onMapView = true;				
 		clearAllDivs();
-
-		loadFilterAndViewButtons(true);
-		
+		loadFilterAndViewButtons(true);		
 		if(reloadParkData)
 			loadMap();
 		else
@@ -183,6 +179,17 @@ public class ParkFinder implements EntryPoint {
 	private void loadDetailsPage(int id) {
 		clearAllDivs();
 		loadDetailsPanel(id);
+	}
+	
+	/** 
+	 * Load the entire add comment page for a park.
+	 * 
+	 * @param id the id of the park to load the add comment page.
+	 * 
+	 */
+	private void loadAddCommentPage(int id) {
+		clearAllDivs();
+		loadAddCommentPanel(id);
 	}
 	
 	/** 
@@ -285,9 +292,10 @@ public class ParkFinder implements EntryPoint {
 	 */
 	public void loadDetailsPanel(final int parkId) {
 		detailsPanel = new VerticalPanel();
+		HorizontalPanel buttonPanel = new HorizontalPanel();
 		addNewRatingButton = new Button("Add/modify your rating");
 		addNewCommentButton = new Button("Add your comment");
-		backToMapButton = new Button("Back to map");
+		backToMapButton = new Button("View park map");
 		parkListButton = new Button("View park list");
 		
 		// Create table for park details.
@@ -318,8 +326,9 @@ public class ParkFinder implements EntryPoint {
 		detailsPanel.add(detailsLabel);
 		detailsPanel.add(detailsImage);
 		detailsPanel.add(detailsFlexTable);
-		detailsPanel.add(backToMapButton);
-		detailsPanel.add(parkListButton);
+		buttonPanel.add(backToMapButton);
+		buttonPanel.add(parkListButton);
+		detailsPanel.add(buttonPanel);
 		detailsPanel.add(ratingsLabel);
 		detailsPanel.add(ratingsFlexTable);
 		detailsPanel.add(addNewRatingButton);
@@ -327,8 +336,7 @@ public class ParkFinder implements EntryPoint {
 		detailsPanel.add(noCommentsLabel);
 		detailsPanel.add(commentFlexTable);
 		detailsPanel.add(addNewCommentButton);
-		detailsPanel.add(showAllCommentsButton);
-		
+		detailsPanel.add(showAllCommentsButton);		
 
 		// Associate details panel with HTML page.
 		RootPanel.get("parkfinder").add(detailsPanel);
@@ -357,8 +365,7 @@ public class ParkFinder implements EntryPoint {
 			@Override
 			public void onClick(ClickEvent event) {
 				clearAllDivs();
-				loadListPage();
-				
+				loadListPage();				
 			}
 		});
 		
@@ -372,8 +379,7 @@ public class ParkFinder implements EntryPoint {
 		// Listen for mouse events on the Add button.
 		addNewCommentButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				RootPanel.get("parkfinder").clear();
-				loadCommentPanel(parkId);
+				loadAddCommentPage(parkId);
 			}
 		});		
 
@@ -390,10 +396,7 @@ public class ParkFinder implements EntryPoint {
 					public void onSuccess(Comment[] result) {
 						getComments(parkId, true);
 					}
-
-				});
-				
-				
+				});				
 			}
 		});
 	}
@@ -600,7 +603,7 @@ public class ParkFinder implements EntryPoint {
 
 	}
 
-	private void loadCommentPanel(final int parkId) {
+	private void loadAddCommentPanel(final int parkId) {
 		// Move cursor focus to the input box
 		commentInputArea = new TextArea();
 		commentInputArea.setFocus(true);
@@ -612,20 +615,24 @@ public class ParkFinder implements EntryPoint {
 		// Assemble comment panel
 		commentPanel = new VerticalPanel();
 		commentPanel.setSpacing(10);
-		commentPanel
-				.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
+		commentPanel.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_CENTER);
 		commentPanel.setSize("500", "500");
+		commentPanel.add(addCommentLabel);
 		commentPanel.add(commentHereLabel);
 		commentPanel.add(commentInputArea);
 
 		// Buttons
+		HorizontalPanel buttonPanel = new HorizontalPanel();
 		submitCommentButton = new Button("Submit");
 		cancelCommentButton = new Button("Cancel");
-		commentPanel.add(cancelCommentButton);
-		commentPanel.add(submitCommentButton);
+		buttonPanel.add(submitCommentButton);
+		buttonPanel.add(cancelCommentButton);
+		commentPanel.add(buttonPanel);
+		
+		// Add styles to elements in the panel.
+		addCommentLabel.addStyleName("detailsLabel");
 
-		RootPanel.get("comments").clear();
-		RootPanel.get("comments").add(commentPanel);
+		RootPanel.get("parkfinder").add(commentPanel);
 
 		// Listen for mouse events on the submit button
 		submitCommentButton.addClickHandler(new ClickHandler() {
@@ -693,7 +700,7 @@ public class ParkFinder implements EntryPoint {
 		HorizontalPanel buttonPanel = new HorizontalPanel();
 		Label ratingLabel = new Label("Rate this park");
 		Label addRatingLabel = new Label("Add your rating for this park.");
-		Button addRatingButton = new Button("Confirm");
+		Button addRatingButton = new Button("Submit");
 		Button cancelRatingButton = new Button("Cancel");
 		
 		// Assemble rating listbox.
@@ -1005,7 +1012,7 @@ public class ParkFinder implements EntryPoint {
 				parkListFlexTable.setText(i, 1, n.substring(n.indexOf(":") + 1, n.indexOf("#")));
 				s= n.substring(n.lastIndexOf("#") + 1);
 				final Integer id=Integer.valueOf(s);
-				goToDetailPage = new Button("View Park's Details");
+				goToDetailPage = new Button("View park details");
 				parkListFlexTable.setWidget(i, 2, goToDetailPage);
 				
 				goToDetailPage.addClickHandler(new ClickHandler() {
@@ -1060,6 +1067,5 @@ public class ParkFinder implements EntryPoint {
 		RootPanel.get("admin").clear();
 		RootPanel.get("filterandview").clear();
 		RootPanel.get("parkfinder").clear();
-		RootPanel.get("comments").clear();
 	}
 }
