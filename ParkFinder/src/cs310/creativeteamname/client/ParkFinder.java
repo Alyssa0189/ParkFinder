@@ -82,6 +82,7 @@ public class ParkFinder implements EntryPoint {
 	private final FacebookServiceAsync facebookService = GWT.create(FacebookService.class);
 	private static final int CHARACTER_LIMIT = 250;
 	private static final String VANCOUVER_URL = "http://vancouver.ca";
+	private static final int COMMENT_NUMBER_LIMIT=3;
 	
 	private ParkMap parkMap;
 	private Label mapFailedToLoadText = new Label("The map failed to load!");;
@@ -547,6 +548,11 @@ public class ParkFinder implements EntryPoint {
 		return str;
 	}
 
+	/**
+	 * Get comments for a park
+	 * @param parkId
+	 * @param displayAll
+	 */
 	private void getComments(int parkId, final boolean displayAll) {
 		commentService.getComment(parkId, new AsyncCallback<Comment[]>() {
 			@Override
@@ -564,7 +570,7 @@ public class ParkFinder implements EntryPoint {
 				if (displayAll) {
 					displayAllComments(result);
 				} else {
-					displayThreeComments(result);
+					displayLimitedComments(result);
 				}
 
 			}
@@ -572,6 +578,10 @@ public class ParkFinder implements EntryPoint {
 
 	}
 
+	/**
+	 * display all comments in flextable
+	 * @param comments
+	 */
 	private void displayAllComments(Comment[] comments) {
 		commentFlexTable.removeAllRows();
 		int i = 0;
@@ -587,13 +597,17 @@ public class ParkFinder implements EntryPoint {
 		}
 	}
 
-	private void displayThreeComments(Comment[] comments) {
+	/**
+	 * * limits the number of comments for details page
+	 * @param comments
+	 */
+	private void displayLimitedComments(Comment[] comments) {
 		commentFlexTable.removeAllRows();
 		int i = 0;
 		if (comments.length != 0) {
 			noCommentsLabel.setVisible(false);
 			for (Comment comment : comments) {
-				if (i < 3) {
+				if (i < COMMENT_NUMBER_LIMIT) {
 					commentFlexTable.setText(i, 1, comment.getUser() + " says: " + comment.getInput());
 				}
 				i++;
@@ -603,6 +617,10 @@ public class ParkFinder implements EntryPoint {
 
 	}
 
+	/**
+	 * setup comment panel
+	 * @param parkId
+	 */
 	private void loadAddCommentPanel(final int parkId) {
 		// Move cursor focus to the input box
 		commentInputArea = new TextArea();
@@ -661,6 +679,10 @@ public class ParkFinder implements EntryPoint {
 		});
 	}
 
+	/**
+	 * Checking conditions for comment to be added
+	 * @param parkId
+	 */
 	private void addComment(int parkId) {
 		final String input = commentInputArea.getText().trim();
 		Comment comment = new Comment();
@@ -674,6 +696,11 @@ public class ParkFinder implements EntryPoint {
 			Window.alert("Please input a comment.");
 	}
 
+	/**
+	 * saves comment
+	 * @param comment
+	 * @param parkId
+	 */
 	private void addComment(Comment comment, final int parkId) {
 		commentService.addComment(comment, new AsyncCallback<Void>() {
 			@Override
@@ -1008,7 +1035,7 @@ public class ParkFinder implements EntryPoint {
 				parkListFlexTable.getRowFormatter().addStyleName(0, "detailsLabel");
 			
 			for (String n : parkNames) {
-				parkListFlexTable.setText(i, 0, n.substring(0, n.indexOf("Address:")));
+				parkListFlexTable.setText(i, 0, n.substring(0, n.indexOf(":")));
 				parkListFlexTable.setText(i, 1, n.substring(n.indexOf(":") + 1, n.indexOf("#")));
 				s= n.substring(n.lastIndexOf("#") + 1);
 				final Integer id=Integer.valueOf(s);
@@ -1045,7 +1072,7 @@ public class ParkFinder implements EntryPoint {
 	 */
 	private TreeSet<String> combineNamAddrId(Set<LightweightPark> parks, TreeSet<String> names) {
 		for (LightweightPark p: parks){
-			names.add(p.getName() + " Address: " + p.getAddress() + "#" + p.getId());	
+			names.add(p.getName() + " : " + p.getAddress() + "#" + p.getId());	
 			}
 		return names;
 		}
