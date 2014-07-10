@@ -725,7 +725,6 @@ public class ParkFinder implements EntryPoint {
 			public void onClick(ClickEvent event) {
 				int index = ratingBox.getSelectedIndex();
 				addRating(parkId, ratingBox.getValue(index));
-				loadDetailsPage(parkId);
 			}
 		});	
 		
@@ -742,7 +741,7 @@ public class ParkFinder implements EntryPoint {
 	 * 
 	 * @param parkId the park's id.
 	 */
-	private void addRating(int parkId, String userRating) {
+	private void addRating(final int parkId, String userRating) {
 		ratingService.addRating(parkId, userRating, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -751,7 +750,7 @@ public class ParkFinder implements EntryPoint {
 
 			@Override
 			public void onSuccess(Void result) {
-				//
+				loadDetailsPage(parkId);
 			}
 		});
 	}
