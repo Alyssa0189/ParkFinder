@@ -49,7 +49,7 @@ public class FacebookServiceImpl extends RemoteServiceServlet  implements Facebo
 		String comment = req.getParameter("comment");
 		token = exchangeCode(code, comment);
 		String userId = debugToken(token, access_token);
-		this.postOnWall(userId, access_token);
+		this.postOnWall(userId, access_token, comment);
 		logger.severe("token = " + token);
 		try {
 			//resp.sendRedirect("http://www.google.com");
@@ -187,7 +187,7 @@ public class FacebookServiceImpl extends RemoteServiceServlet  implements Facebo
 		
 	}
 	
-	private void postOnWall(String userId, String accessToken) {
+	private void postOnWall(String userId, String accessToken, String comment) {
 		String url = postURL + "/";
 		url += userId + "/feed";
 
@@ -202,7 +202,7 @@ public class FacebookServiceImpl extends RemoteServiceServlet  implements Facebo
 			con.setRequestMethod("POST");
 			con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-			String urlParameters = "message=" + "dan is testing something"
+			String urlParameters = "message=" + comment + " http://1-dot-yvrparks.appspot.com"
 					+ "&";
 			urlParameters += "access_token=" + accessToken;
 
