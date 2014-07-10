@@ -33,8 +33,8 @@ public class FeatureList {
 	 * 
 	 * @param featureOption the name of the feature option.
 	 */
-	public void addFeatureOption(String featureName) {
-		FeatureOption featureOption = new FeatureOption(featureName);
+	public void addFeatureOption(String featureName, boolean isNeighborhood) {
+		FeatureOption featureOption = new FeatureOption(featureName, isNeighborhood);
 		featureOptions.add(featureOption);
 	}
 	

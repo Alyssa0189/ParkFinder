@@ -47,13 +47,12 @@ public class ParkFinder implements EntryPoint {
 	private Button showAllCommentsButton = new Button("Show all comments");
 	private Button addNewRatingButton = new Button("Add/modify your rating");
 	private Button filterButton = new Button("Filter parks");
+	private Button backFromFilterButton = new Button("Back (apply filters)");
 	private Button submitCommentButton = new Button("Submit");
 	private Button cancelCommentButton = new Button("Cancel");
 	private Button parkListButton = new Button("View park list");
 	private Button goToDetailPage = new Button("View park details");
 	private Button mapButton = new Button("Back to map");
-	
-	private Image backFromFilterImage = new Image();
 
 	private HashMap<Integer, Park> allParks = new HashMap<Integer, Park>();
 
@@ -100,6 +99,7 @@ public class ParkFinder implements EntryPoint {
 	private FlexTable ratingsFlexTable = new FlexTable();
 	
 	private Set<String> allNeighborhoods = new TreeSet<String>();
+	String[] neighborhoodsList = {"Arbutus Ridge","Downtown","Dunbar-Southlands","Fairview","Grandview-Woodland","Hastings-Sunrise","Kensington-Cedar Cottage","Kerrisdale","Killarney","Kitsilano","Marpole","Mount Pleasant","Oakridge","Renfrew-Collingwood","Riley-Little Mountain","Shaughnessy","South Cambie","Strathcona","Sunset","Victoria-Fraserview","West End","West Point Grey"};
 
 	/**
 	 * This is the entry point method.
@@ -187,18 +187,16 @@ public class ParkFinder implements EntryPoint {
 	private void loadFilterPage() {
 		clearAllDivs();
 
-		backFromFilterImage = new Image();
+		backFromFilterButton = new Button("Back (apply filters)");
 		
-		RootPanel.get("filterandview").add(backFromFilterImage);
+		RootPanel.get("filterandview").add(backFromFilterButton);
 		
 		FlexTable filterTable = createFilterTable().getWidget();
 		
 		RootPanel.get("parkfinder").add(filterTable);
 		
-		backFromFilterImage.setUrl("images/backFromFilterImage.png");;
-		
 		// Listen for mouse events on the Back button.
-		backFromFilterImage.addClickHandler(new ClickHandler() {
+		backFromFilterButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
 					if(onMapView)
 						loadMapPage(true);
@@ -886,21 +884,19 @@ public class ParkFinder implements EntryPoint {
 	private FilterTable createFilterTable() {
 		FilterTable filterTable = new FilterTable();
 		
+		addFeaturesToTable("Limit parks to neighbourhoods", neighborhoodsList, filterTable, true);
+		
 		String[] sportsFields = {"Baseball Diamonds","Bowling Greens","Cricket Pitches","Field Hockey","Football Fields","Rugby Fields","Soccer Fields","Ultimate Fields"};
-		
 		String[] sportsOther = {"Ball Hockey", "Basketball Courts","Disc Golf Courses","Golf Courses","Horseshoe Pitch","Lacrosse Boxes","Outdoor Roller Hockey Rinks","Rinks","Running Tracks","Skateboard Parks","Softball","Sport Court","Swimming Pools","Tennis Courts"};
-
 		String[] buildings = {"Community Centres","Community Halls","Field Houses","Food Concessions","Restaurants","Washrooms"};
-
 		String[] walkingAndExercise = {"Dogs Off-Leash Areas","Exercise Stations","Jogging Trails","Perimeter Walking Path","Senior's Wellness Circuit"};
-		
 		String[] generalFeatures = {"Beaches","Designated Wedding Ceremony Site","Hellenic Garden","Lighted Fields","Picnic Benches","Picnic Sites","Playgrounds","Seawall","Water/Spray Parks","Wading Pool"};
 		
-		addFeaturesToTable("Sports - Fields", sportsFields, filterTable);
-		addFeaturesToTable("Sports - Other", sportsOther, filterTable);
-		addFeaturesToTable("Buildings", buildings, filterTable);
-		addFeaturesToTable("Walking and Exercise", walkingAndExercise, filterTable);
-		addFeaturesToTable("General Features", generalFeatures, filterTable);
+		addFeaturesToTable("Sports - Fields", sportsFields, filterTable, false);
+		addFeaturesToTable("Sports - Other", sportsOther, filterTable, false);
+		addFeaturesToTable("Buildings", buildings, filterTable, false);
+		addFeaturesToTable("Walking and Exercise", walkingAndExercise, filterTable, false);
+		addFeaturesToTable("General Features", generalFeatures, filterTable, false);
 		
 		return filterTable;
 	}
@@ -908,11 +904,11 @@ public class ParkFinder implements EntryPoint {
 	/** Adds one category of features to a given table.
 	 * 
 	 */
-	private void addFeaturesToTable(String title, String[] features, FilterTable table) {
+	private void addFeaturesToTable(String title, String[] features, FilterTable table, boolean isNeighborhood) {
 		FeatureList featureList = new FeatureList(title);
 		
 		for(String feature : features) {
-			featureList.addFeatureOption(feature);
+			featureList.addFeatureOption(feature, isNeighborhood);
 		}
 		
 		table.addFeatureList(featureList);
@@ -954,7 +950,7 @@ public class ParkFinder implements EntryPoint {
 		
 		mapButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				loadMapPage(false);
+				loadMapPage(true);
 			}
 		});
 	}
@@ -1037,9 +1033,7 @@ public class ParkFinder implements EntryPoint {
 	 * 
 	 */
 	private void loadNeighborhoods() {
-		String[] neighborhoods = {"Arbutus Ridge","Downtown","Dunbar-Southlands","Fairview","Grandview-Woodland","Hastings-Sunrise","Kensington-Cedar Cottage","Kerrisdale","Killarney","Kitsilano","Marpole","Mount Pleasant","Oakridge","Renfrew-Collingwood","Riley-Little Mountain","Shaughnessy","South Cambie","Strathcona","Sunset","Victoria-Fraserview","West End","West Point Grey"};
-		
-		for(String neighborhood : neighborhoods) {
+		for(String neighborhood : neighborhoodsList) {
 			allNeighborhoods.add(neighborhood);
 		}
 	}

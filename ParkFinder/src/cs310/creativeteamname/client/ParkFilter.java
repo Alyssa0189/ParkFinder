@@ -6,8 +6,6 @@ package cs310.creativeteamname.client;
 
 import cs310.creativeteamname.shared.Park;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -44,6 +42,9 @@ public class ParkFilter {
 	 * @return the filtered set of parks.
 	 */
 	public Set<Park> getFilteredParks() {
+		
+		System.out.println("Getting " + filteredParks.size() + " filtered parks.");
+		
 		return filteredParks;
 	}
 	
@@ -66,7 +67,6 @@ public class ParkFilter {
 		for(String feature : features)
 			filterBy(feature);
 
-		// printFilteredParks();
 		return filteredParks.size();
 	}
 	
@@ -102,9 +102,7 @@ public class ParkFilter {
 				parksTemp.add(park);
 
 		filteredParks = new TreeSet<Park>(parksTemp);
-		
-		System.out.println("Filtering by " + feature);
-		printFilteredParks();
+
 		return filteredParks.size();
 	}
 	
@@ -114,10 +112,14 @@ public class ParkFilter {
 	 */
 	public void filterOutNeighborhood(String neighborhood) {
 		filteringByNeighborhoods.remove(neighborhood);
+
+		Set<Park> parksTemp = new TreeSet<Park>();
 		
 		for(Park park : filteredParks)
 			if(!isInNeighborhood(park, neighborhood))
-				filteredParks.remove(park);
+				parksTemp.add(park);
+		
+		filteredParks = new TreeSet<Park>(parksTemp);
 	}
 	
 	/** Filter in parks from a particular neighborhood.

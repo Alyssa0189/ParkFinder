@@ -17,26 +17,21 @@ public class FeatureOption implements Comparable {
 	CheckBox featureCheckbox;
 	HorizontalPanel featurePanel;
 	ParkFilter filter;
+	boolean isNeighborhood;
 	
 	/** Create a new feature option with a given feature.
 	 * 
 	 * @param feature the feature's name.
 	 */
-	public FeatureOption(String featureName) {
+	public FeatureOption(String featureName, boolean isNeighborhood) {
 		filter = ParkFilter.getInstance(null, null);
 		this.featureName = featureName;
 		featureCheckbox = new CheckBox(featureName);
 		featureCheckbox.setValue(false);
 		featurePanel = new HorizontalPanel();
+		this.isNeighborhood = isNeighborhood;
 		
-		System.out.println("Checking if " + featureName + " is being filtered.");
-		
-		// Check the box if this feature was selected last time the page was visited.
-		if(filter.beingFiltered(featureName)) {
-			System.out.println("Setting checkbox " + featureName + " to true.");
-			featureCheckbox.setValue(true);
-		}
-		
+		checkIfNecessary();
 		featurePanel.add(featureCheckbox);
 		addClickHandler();
 	}
@@ -66,12 +61,32 @@ public class FeatureOption implements Comparable {
 			@Override
 			public void onClick(ClickEvent event) {
 				boolean checked = ((CheckBox) event.getSource()).getValue();
-				if(checked)
-					filter.filterBy(featureName);
-				else
-					filter.undoFilterBy(featureName);
+				if(checked) {
+					if(isNeighborhood)
+						filter.filterInNeighborhood(featureName);
+					else
+						filter.filterBy(featureName);
+				}
+				else {
+					if(isNeighborhood) {
+						filter.filterOutNeighborhood(featureName);
+					}
+					else
+						filter.undoFilterBy(featureName);
+				}
 			}
 		});
+	}
+	
+	/** Check this option's checkbox if it was checked before.
+	 * 
+	 */
+	private void checkIfNecessary() {
+		boolean isNeighborhoodFilter = (isNeighborhood)? filter.neighborhoodBeingFiltered(featureName):false;
+		
+		if(filter.beingFiltered(featureName) || isNeighborhoodFilter) {
+			featureCheckbox.setValue(true);
+		}
 	}
 	
 	@Override
