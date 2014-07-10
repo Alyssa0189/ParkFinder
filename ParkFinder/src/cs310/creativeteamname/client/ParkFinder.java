@@ -77,6 +77,8 @@ public class ParkFinder implements EntryPoint {
 	
 	private final LocationServiceAsync locationService = GWT
 			.create(LocationService.class);
+	
+	private final FacebookServiceAsync facebookService = GWT.create(FacebookService.class);
 	private static final int CHARACTER_LIMIT = 250;
 	private static final String VANCOUVER_URL = "http://vancouver.ca";
 	
@@ -122,6 +124,19 @@ public class ParkFinder implements EntryPoint {
 						}
 					}
 				});
+		
+		facebookService.logAppOnFacebook(new AsyncCallback<String>(){
+			@Override
+			public void onFailure(Throwable caught) {
+				// TODO Auto-generated method stub
+				
+			}
+			@Override
+			public void onSuccess(String result) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
 	
 	// The following 5 methods should do all the work for loading a page,

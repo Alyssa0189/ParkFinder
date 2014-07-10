@@ -5,5 +5,5 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("facebook")
 public interface FacebookService extends RemoteService{
-
+	public String logAppOnFacebook();
 }
