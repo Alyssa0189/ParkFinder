@@ -15,21 +15,27 @@ public class ParkFilter {
 	
 	Set<Park> allParks;
 	Set<Park> filteredParks;
-	List<String> filteringBy;
+	Set<String> filteringBy;
+	Set<String> filteringByNeighborhoods;
+	Set<String> allNeighborhoods;
 	private static ParkFilter instance;
 	
 	/** Create a new park filter with a given set of parks.
 	 * 
+	 * @param parks all parks considered for filtering
+	 * @param neighborhoods all neighborhoods being considered.
 	 */
-	private ParkFilter(Set<Park> parks) {
+	private ParkFilter(Set<Park> parks, Set<String> neighborhoods) {
 		this.allParks = new TreeSet<Park>(parks);
 		this.filteredParks = new TreeSet<Park>(parks);
-		this.filteringBy = new ArrayList<String>();
+		this.filteringBy = new TreeSet<String>();
+		this.filteringByNeighborhoods = new TreeSet<String>(neighborhoods);
+		this.allNeighborhoods = new TreeSet<String>(neighborhoods);
 	}
 	
-	public static ParkFilter getInstance(Set<Park> parks) {
+	public static ParkFilter getInstance(Set<Park> parks, Set<String> neighborhoods) {
 		if(instance == null)
-			instance = new ParkFilter(parks);
+			instance = new ParkFilter(parks, neighborhoods);
 		return instance;
 	}
 	
@@ -48,6 +54,7 @@ public class ParkFilter {
 		if(filteredParks.size() < allParks.size())
 			filteredParks = new TreeSet<Park>(allParks);
 		filteringBy.clear();
+		filteringByNeighborhoods = new TreeSet<String>(allNeighborhoods);
 	}
 	
 	/** Filter the existing set of parks by features.
@@ -58,14 +65,12 @@ public class ParkFilter {
 	public int filterBy(String[] features) {
 		for(String feature : features)
 			filterBy(feature);
-		
-		
-		System.out.println("Filtering by some features: " + features[0] + " ... ");
-		printFilteredParks();
+
+		// printFilteredParks();
 		return filteredParks.size();
 	}
 	
-	/** Filter the existing set of parks by a particular feature.
+	/** Filter the existing set of filtered parks by a particular feature.
 	 * 
 	 * @param feature the feature to filter the set by.
 	 * @return the number of resulting parks.
@@ -79,12 +84,8 @@ public class ParkFilter {
 				parksTemp.add(park);
 		
 		filteredParks = parksTemp;
-		System.out.println("Filtering by " + feature);
 		printFilteredParks();
 		return filteredParks.size();
-		
-		
-		
 	}
 	
 	/** Undo the result of filtering out a particular feature.
@@ -97,7 +98,7 @@ public class ParkFilter {
 		Set<Park> parksTemp = new TreeSet<Park>(filteredParks);
 		
 		for(Park park : allParks)
-			if(hasFeatures(park, filteringBy))
+			if(passesBothFilters(park))
 				parksTemp.add(park);
 
 		filteredParks = new TreeSet<Park>(parksTemp);
@@ -107,11 +108,32 @@ public class ParkFilter {
 		return filteredParks.size();
 	}
 	
-	/** Remove all filters.
+	/** Filter out parks from a particular neighborhood.
 	 * 
+	 * @param neighborhood the neighborhood to filter out by
 	 */
-	public void removeAllFilters() {
-		filteredParks = new TreeSet<Park>(allParks);
+	public void filterOutNeighborhood(String neighborhood) {
+		filteringByNeighborhoods.remove(neighborhood);
+		
+		for(Park park : filteredParks)
+			if(!isInNeighborhood(park, neighborhood))
+				filteredParks.remove(park);
+	}
+	
+	/** Filter in parks from a particular neighborhood.
+	 * 
+	 * @param neighborhood the neighborhood to filter in by
+	 */
+	public void filterInNeighborhood(String neighborhood) {
+		filteringByNeighborhoods.add(neighborhood);
+		
+		Set<Park> parksTemp = new TreeSet<Park>();
+		
+		for(Park park : allParks) 
+			if(passesBothFilters(park))
+				parksTemp.add(park);
+		
+		filteredParks = new TreeSet<Park>(parksTemp);
 	}
 	
 	/** Determine whether or not a particular filter is being applied.
@@ -123,13 +145,42 @@ public class ParkFilter {
 		return filteringBy.contains(potentialFilter);
 	}
 	
+	/** Determine whether or not a particular neighborhood filter is being applied.
+	 * 
+	 * @param potentialFilter the neighborhood
+	 * @return true if the neighborhood is being filtered.
+	 */
+	public boolean neighborhoodBeingFiltered(String potentialFilter) {
+		return filteringByNeighborhoods.contains(potentialFilter);
+	}
+	
+	/** Determine whether or not a park passes through both feature and neighborhood filters.
+	 * 
+	 * @param park the park to test.
+	 * @return true if the park has all the features specified in the filter and is in a filtered-in neighborhood.
+	 */
+	private boolean passesBothFilters(Park park) {
+		return hasFeatures(park, filteringBy) && isInNeighborhoodFilter(park);
+	}
+	
+	/** Determine whether or not a given park is in a particular neighborhood.
+	 * 
+	 * @param park the park to consider
+	 * @param neighborhood the neighborhood to consider
+	 * @return true if the given park is in the given neighborhood.
+	 */
+	private boolean isInNeighborhood(Park park, String neighborhood) {
+		String parkNeighborhood = park.getNeighbourhoodName();
+		return (parkNeighborhood.equals(neighborhood));
+	}
+	
 	/** Determine whether or not a given park has all the given features.
 	 * 
 	 * @param park the park to check.
 	 * @param feature the features to determine if the park has.
 	 * @return true if the park has the given features.
 	 */
-	private boolean hasFeatures(Park park, List<String> features) {
+	private boolean hasFeatures(Park park, Set<String> features) {
 		for(String feature : features)
 			if(!hasFeature(park, feature))
 				return false;
@@ -168,6 +219,16 @@ public class ParkFilter {
 		
 		return parkFeatures;
 	}
+
+	/** Determine whether or not a particular park is in the neighborhood filter.
+	 * 
+	 * @param park the park to test.
+	 * @return true if this park's neighborhood is in the list of neighborhood filters being applied.
+	 */
+	private boolean isInNeighborhoodFilter(Park park) {
+		String parkNeighborhood = park.getNeighbourhoodName();
+		return filteringByNeighborhoods.contains(parkNeighborhood);
+	}
 	
 	// Method for testing.
 	private void printFilteredParks() {
@@ -179,6 +240,10 @@ public class ParkFilter {
 		for(String fb : filteringBy) {
 			System.out.print(" " + fb);
 		}
-		System.out.println();
+		System.out.println("\n\nNeighborhoods included (" + filteringByNeighborhoods.size() + " neighborhoods):");
+		for(String n : filteringByNeighborhoods) {
+			System.out.print(" " + n);
+		}
+		System.out.println("\n");
 	}
 }

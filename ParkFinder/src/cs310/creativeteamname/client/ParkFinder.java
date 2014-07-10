@@ -98,6 +98,8 @@ public class ParkFinder implements EntryPoint {
 	
 	private Label ratingsLabel = new Label("User Ratings");
 	private FlexTable ratingsFlexTable = new FlexTable();
+	
+	private Set<String> allNeighborhoods = new TreeSet<String>();
 
 	/**
 	 * This is the entry point method.
@@ -136,7 +138,7 @@ public class ParkFinder implements EntryPoint {
 		onMapView = true;
 				
 		clearAllDivs();
-		System.out.println("Loading map page!!!!!!!!!!!!!");
+
 		loadFilterAndViewButtons(true);
 		
 		if(reloadParkData)
@@ -184,7 +186,6 @@ public class ParkFinder implements EntryPoint {
 	 */
 	private void loadFilterPage() {
 		clearAllDivs();
-		filter.removeAllFilters();
 
 		backFromFilterImage = new Image();
 		
@@ -245,6 +246,7 @@ public class ParkFinder implements EntryPoint {
 		loginPanel = new VerticalPanel();
 		loginPanel.add(signOutLink);
 		RootPanel.get("login").add(loginPanel);
+		loadNeighborhoods();
 		
 		// Call location service.
 		locationService.getAllParks(new AsyncCallback<HashMap<Integer, Park>>() {
@@ -422,7 +424,6 @@ public class ParkFinder implements EntryPoint {
 		parkListButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				System.out.println("Clicked park list button detected!");
 				loadListPage();
 			}
 		});
@@ -929,7 +930,7 @@ public class ParkFinder implements EntryPoint {
 			resultingParks.add(park);
 		}
 		
-		filter = ParkFilter.getInstance(resultingParks);
+		filter = ParkFilter.getInstance(resultingParks, allNeighborhoods);
 	}
 
 	/**
@@ -966,22 +967,7 @@ public class ParkFinder implements EntryPoint {
 		Set<LightweightPark> parkList = (TreeSet<LightweightPark>) getLightParksFromHeavy(filteredParks);
 		System.out.println("Displaying " + parkList.size() + " filtered parks.");
 		loadParkList(parkList);
-		/*
-		locationService
-				.getAllParks(new AsyncCallback<HashMap<Integer, Park>>() {
-					@Override
-					public void onFailure(Throwable caught) {
-						handleError(caught);
-					}
-
-					@Override
-					public void onSuccess(HashMap<Integer, Park> result) {
-						allParks = result;
-						parksList = (TreeSet<LightweightPark>) getLightParksFromHeavy(result);
-						loadParkList(parksList);
-					}
-				});
-				*/
+		
 		}
 	
 	
@@ -1046,6 +1032,17 @@ public class ParkFinder implements EntryPoint {
 			}
 		return names;
 		}
+	
+	/** Load all the neighborhoods into the neighborhoods list.
+	 * 
+	 */
+	private void loadNeighborhoods() {
+		String[] neighborhoods = {"Arbutus Ridge","Downtown","Dunbar-Southlands","Fairview","Grandview-Woodland","Hastings-Sunrise","Kensington-Cedar Cottage","Kerrisdale","Killarney","Kitsilano","Marpole","Mount Pleasant","Oakridge","Renfrew-Collingwood","Riley-Little Mountain","Shaughnessy","South Cambie","Strathcona","Sunset","Victoria-Fraserview","West End","West Point Grey"};
+		
+		for(String neighborhood : neighborhoods) {
+			allNeighborhoods.add(neighborhood);
+		}
+	}
 	
 	
 	/** Clear all the divs on the page for loading a different page.

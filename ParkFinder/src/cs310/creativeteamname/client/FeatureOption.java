@@ -23,15 +23,19 @@ public class FeatureOption implements Comparable {
 	 * @param feature the feature's name.
 	 */
 	public FeatureOption(String featureName) {
-		filter = ParkFilter.getInstance(null);
+		filter = ParkFilter.getInstance(null, null);
 		this.featureName = featureName;
 		featureCheckbox = new CheckBox(featureName);
 		featureCheckbox.setValue(false);
 		featurePanel = new HorizontalPanel();
 		
+		System.out.println("Checking if " + featureName + " is being filtered.");
+		
 		// Check the box if this feature was selected last time the page was visited.
-		if(filter.beingFiltered(featureName))
+		if(filter.beingFiltered(featureName)) {
+			System.out.println("Setting checkbox " + featureName + " to true.");
 			featureCheckbox.setValue(true);
+		}
 		
 		featurePanel.add(featureCheckbox);
 		addClickHandler();
