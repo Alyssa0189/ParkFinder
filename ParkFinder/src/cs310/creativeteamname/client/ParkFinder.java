@@ -218,13 +218,19 @@ public class ParkFinder implements EntryPoint {
 		
 		RootPanel.get("parkfinder").add(filterTable);
 		
+		int nParks = ParkFilter.getInstance(null,  null).getFilteredParks().size();
+		NParksLabel nParksLabel = NParksLabel.getInstance(nParks);
+		nParksLabel.display();
+		
 		// Listen for mouse events on the Back button.
 		backFromFilterButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-					if(onMapView)
-						loadMapPage(true);
-					else
-						loadListPage();
+				NParksLabel nParksLabel = NParksLabel.getInstance(-1);
+				nParksLabel.removeLabel();
+				if(onMapView)
+					loadMapPage(true);
+				else
+					loadListPage();
 			}
 		});
 	}	
@@ -933,7 +939,7 @@ public class ParkFinder implements EntryPoint {
 	private FilterTable createFilterTable() {
 		FilterTable filterTable = new FilterTable();
 		
-		addFeaturesToTable("Limit parks to neighbourhoods", neighborhoodsList, filterTable, true);
+		addFeaturesToTable("Limit to Neighbourhoods", neighborhoodsList, filterTable, true);
 		
 		String[] sportsFields = {"Baseball Diamonds","Bowling Greens","Cricket Pitches","Field Hockey","Football Fields","Rugby Fields","Soccer Fields","Ultimate Fields"};
 		String[] sportsOther = {"Ball Hockey", "Basketball Courts","Disc Golf Courses","Golf Courses","Horseshoe Pitch","Lacrosse Boxes","Outdoor Roller Hockey Rinks","Rinks","Running Tracks","Skateboard Parks","Softball","Sport Court","Swimming Pools","Tennis Courts"};
@@ -1010,7 +1016,6 @@ public class ParkFinder implements EntryPoint {
 	private void displayParkList() {
 		Set<Park> filteredParks = filter.getFilteredParks();
 		Set<LightweightPark> parkList = (TreeSet<LightweightPark>) getLightParksFromHeavy(filteredParks);
-		System.out.println("Displaying " + parkList.size() + " filtered parks.");
 		loadParkList(parkList);
 		
 		}

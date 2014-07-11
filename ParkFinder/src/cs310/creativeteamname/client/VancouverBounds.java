@@ -10,8 +10,8 @@ import com.google.gwt.maps.client.geom.LatLngBounds;
 public class VancouverBounds {
 	
 	private final double VANCOUVER_SOUTH_LATITUDE = 49.197859;
-	private final double VANCOUVER_NORTH_LATITUDE = 49.316394;
-	private final double VANCOUVER_WEST_LONGITUDE = -123.264599;
+	private final double VANCOUVER_NORTH_LATITUDE = 49.309384;
+	private final double VANCOUVER_WEST_LONGITUDE = -123.226901;
 	private final double VANCOUVER_EAST_LONGITUDE = -123.021839;
 	
 	public static VancouverBounds instance = null;

@@ -87,6 +87,7 @@ border: 1px solid silver;
 	text-align: center;
 	align: center;
 	vertical-align: bottom;
+	padding: 10px;
 }
 
 .filterTable {
@@ -137,4 +138,10 @@ border: 1px solid silver;
 	font-size: 1.1em;
 	color: #365e2a;
 }
-.
+
+#nParksLabel {
+	font-size: 1.0em;
+	color: #365e2a;
+	margin-top: 10px;
+	font-weight: bold;
+}

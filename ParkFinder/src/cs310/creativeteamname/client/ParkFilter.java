@@ -16,6 +16,7 @@ public class ParkFilter {
 	Set<String> filteringBy;
 	Set<String> filteringByNeighborhoods;
 	Set<String> allNeighborhoods;
+	NParksLabel nParksLabel;
 	private static ParkFilter instance;
 	
 	/** Create a new park filter with a given set of parks.
@@ -29,6 +30,7 @@ public class ParkFilter {
 		this.filteringBy = new TreeSet<String>();
 		this.filteringByNeighborhoods = new TreeSet<String>(neighborhoods);
 		this.allNeighborhoods = new TreeSet<String>(neighborhoods);
+		this.nParksLabel = NParksLabel.getInstance(filteredParks.size());
 	}
 	
 	public static ParkFilter getInstance(Set<Park> parks, Set<String> neighborhoods) {
@@ -42,9 +44,6 @@ public class ParkFilter {
 	 * @return the filtered set of parks.
 	 */
 	public Set<Park> getFilteredParks() {
-		
-		System.out.println("Getting " + filteredParks.size() + " filtered parks.");
-		
 		return filteredParks;
 	}
 	
@@ -84,7 +83,7 @@ public class ParkFilter {
 				parksTemp.add(park);
 		
 		filteredParks = parksTemp;
-		printFilteredParks();
+		updateNParksLabel();
 		return filteredParks.size();
 	}
 	
@@ -102,7 +101,8 @@ public class ParkFilter {
 				parksTemp.add(park);
 
 		filteredParks = new TreeSet<Park>(parksTemp);
-
+		
+		updateNParksLabel();
 		return filteredParks.size();
 	}
 	
@@ -120,6 +120,7 @@ public class ParkFilter {
 				parksTemp.add(park);
 		
 		filteredParks = new TreeSet<Park>(parksTemp);
+		updateNParksLabel();
 	}
 	
 	/** Filter in parks from a particular neighborhood.
@@ -136,6 +137,7 @@ public class ParkFilter {
 				parksTemp.add(park);
 		
 		filteredParks = new TreeSet<Park>(parksTemp);
+		updateNParksLabel();
 	}
 	
 	/** Determine whether or not a particular filter is being applied.
@@ -154,6 +156,13 @@ public class ParkFilter {
 	 */
 	public boolean neighborhoodBeingFiltered(String potentialFilter) {
 		return filteringByNeighborhoods.contains(potentialFilter);
+	}
+	
+	/** Update the number of parks label.
+	 * 
+	 */
+	private void updateNParksLabel() {
+		nParksLabel.updateText(filteredParks.size());
 	}
 	
 	/** Determine whether or not a park passes through both feature and neighborhood filters.
@@ -230,22 +239,5 @@ public class ParkFilter {
 	private boolean isInNeighborhoodFilter(Park park) {
 		String parkNeighborhood = park.getNeighbourhoodName();
 		return filteringByNeighborhoods.contains(parkNeighborhood);
-	}
-	
-	// Method for testing.
-	private void printFilteredParks() {
-		System.out.println("Filtered parks (" + filteredParks.size() + " parks):");
-		for(Park park : filteredParks) {
-			System.out.print(" " + park.getName());
-		}
-		System.out.println("\n\nFiltering by (" + filteringBy.size() + " filters):");
-		for(String fb : filteringBy) {
-			System.out.print(" " + fb);
-		}
-		System.out.println("\n\nNeighborhoods included (" + filteringByNeighborhoods.size() + " neighborhoods):");
-		for(String n : filteringByNeighborhoods) {
-			System.out.print(" " + n);
-		}
-		System.out.println("\n");
 	}
 }
