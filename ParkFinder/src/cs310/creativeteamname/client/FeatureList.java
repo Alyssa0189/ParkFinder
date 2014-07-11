@@ -7,6 +7,7 @@ package cs310.creativeteamname.client;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -24,9 +25,19 @@ public class FeatureList {
 	public FeatureList(String title) {
 		this.title = title;
 		Label titleLabel = new Label(title);
+		
+		// Got line from http://stackoverflow.com/questions/6405581/how-can-i-change-the-font-size-of-a-gwt-label-object-dynamically
+		// titleLabel.getElement().getStyle().setFontSize(1.2, Unit.EM);
+		
+		titleLabel.addStyleName("filterCategoryLabel");
+		
+		
 		panelForDisplay = new VerticalPanel();
 		panelForDisplay.add(titleLabel);
 		featureOptions = new TreeSet<FeatureOption>();
+		panelForDisplay.setWidth("210px");
+		panelForDisplay.setSpacing(5);
+		panelForDisplay.setStyleName("featurelist");
 	}
 	
 	/** Add a feature option to this list of features.

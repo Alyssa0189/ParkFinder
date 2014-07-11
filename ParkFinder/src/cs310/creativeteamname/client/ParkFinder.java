@@ -892,6 +892,7 @@ public class ParkFinder implements EntryPoint {
 			MapWidget mapWidget = parkMap.getWidget(this);
 			dock.addNorth(mapWidget, 500);
 			RootPanel.get("parkfinder").add(dock);
+			dock.setStyleName("parkmap");
 
 			parkMap.zoomAndCenter(700, 500);
 		} catch (Exception e) {

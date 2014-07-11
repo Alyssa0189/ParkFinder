@@ -4,8 +4,6 @@
 
 package cs310.creativeteamname.client;
 
-import cs310.creativeteamname.shared.Park;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -30,6 +28,8 @@ public class FeatureOption implements Comparable {
 		featureCheckbox.setValue(false);
 		featurePanel = new HorizontalPanel();
 		this.isNeighborhood = isNeighborhood;
+		
+		featureCheckbox.setWordWrap(false);
 		
 		checkIfNecessary();
 		featurePanel.add(featureCheckbox);

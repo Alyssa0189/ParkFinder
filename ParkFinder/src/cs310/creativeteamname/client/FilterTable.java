@@ -9,20 +9,23 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class FilterTable {
 	
-	final int MAX_ITEMS_PER_COLUMN = 16;
+	final int MAX_ITEMS_PER_COLUMN = 25;
+	final int FILTER_LIST_ROW = 0;
 	
-	int onRow;
 	int onCol;
 	int featuresInCurrentCol;
 	
 	FlexTable filterTable;
+	VerticalPanel colContents;
 	
 	/** Create a new filter table.
 	 */
 	public FilterTable() {
 		filterTable = new FlexTable();
-		filterTable.setCellPadding(6);
-		onRow = 0;
+		filterTable.addStyleName("filtertable");
+		filterTable.setCellPadding(20);
+
+		colContents = new VerticalPanel();
 		onCol = 0;
 	}
 	
@@ -31,10 +34,14 @@ public class FilterTable {
 	 * @param featureList the feature list to add.
 	 */
 	public void addFeatureList(FeatureList featureList) {
-		setNextRowAndCol(featureList);
+		if(setNextCol(featureList)) {
+			filterTable.setWidget(FILTER_LIST_ROW, onCol - 1, colContents);
+			colContents = new VerticalPanel();
+			colContents.addStyleName("colcontents");
+		}
 		
 		VerticalPanel featureListWidget = featureList.getWidget();
-		filterTable.setWidget(onRow, onCol, featureListWidget);
+		colContents.add(featureListWidget);
 	}
 	
 	/** Get the widget of this filter table.
@@ -42,23 +49,24 @@ public class FilterTable {
 	 * @return the FlexTable to display for this filter table.
 	 */
 	public FlexTable getWidget() {
+		filterTable.setWidget(FILTER_LIST_ROW, onCol, colContents);
 		return filterTable;
 	}
 	
-	/** Set the next row and column to add a feature list to.
+	/** Set the next column to add a feature list to.
 	 * 
 	 * @param featureList the list that will be added next.
+	 * @return true if starting a new column.
 	 */
-	private void setNextRowAndCol(FeatureList featureList) {
+	private boolean setNextCol(FeatureList featureList) {
 		if(shouldStartNewColumn(featureList)) {
-			onRow = 0;
-			onCol++;
 			featuresInCurrentCol = featureList.getNumFeatures();
+			onCol++;
+			return true;
 		}
 		else {
-			if(!onFirstCell())
-				onRow++;
 			featuresInCurrentCol += featureList.getNumFeatures();
+			return false;
 		}
 	}
 	
@@ -70,13 +78,5 @@ public class FilterTable {
 	private boolean shouldStartNewColumn(FeatureList nextFeatureList) {
 		int numFeatures = nextFeatureList.getNumFeatures();
 		return (featuresInCurrentCol + numFeatures > MAX_ITEMS_PER_COLUMN);
-	}
-	
-	/** Determine whether or not the next cell to fill is the first one.
-	 * 
-	 * @return true if the next cell to fill is the first one.
-	 */
-	private boolean onFirstCell() {
-		return (onRow == 0 && onCol == 0);
 	}
 }
