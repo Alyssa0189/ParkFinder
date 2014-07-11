@@ -4,14 +4,14 @@ body {
   text-align: center;
 }
 
-/* details panel */
-.detailsPanel {
+/* panel */
+.panel {
   border-spacing: 6px;
   width: 600px;
 }
 
-/* details label */
-.detailsLabel {
+/* panel label */
+.panelLabel {
   background-color: #567E3A;
   color: white;
   font-size: 16px;
@@ -31,7 +31,7 @@ body {
   width: 600px;
 }
 
-/* details column */
+/* details flex table column */
 .detailsColumns {
   width: 150px;
 }
@@ -71,13 +71,13 @@ h1 {
 #parkfinder {
 	width:700px;
 	height:500px;
-	margin:0 auto;
+	margin:6px auto;
 }
 
 .parklistflextable {
-border: 1px solid silver;
+  border: 1px solid silver;
   padding: 2px;
-  margin-bottom:6px;
+  margin-bottom: 6px;
 }
 
 #filterandview {
