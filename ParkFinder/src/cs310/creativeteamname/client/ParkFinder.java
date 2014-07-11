@@ -17,6 +17,7 @@ import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
@@ -661,12 +662,22 @@ public class ParkFinder implements EntryPoint {
 		// Listen for mouse events on the submit button
 		submitCommentButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
+				facebookService.setStoryData(commentInputArea.getText(), allParks.get(parkId).getName(), new AsyncCallback<String>(){
+					@Override
+					public void onFailure(Throwable caught) {
+					}
+					@Override
+					public void onSuccess(String result) {
+					}
+				});
+				
 				addComment(parkId);
+				
 				commentInputArea.setText("");
 				loadDetailsPage(parkId);
+				new CommentPopup().show();
 			}
 		});
-
 		// Listen for mouse events on the cancel button
 		cancelCommentButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {

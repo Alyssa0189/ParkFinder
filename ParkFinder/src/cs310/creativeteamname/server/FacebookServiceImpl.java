@@ -27,17 +27,24 @@ public class FacebookServiceImpl extends RemoteServiceServlet  implements Facebo
 	String confirmIdentityURL = "https://graph.facebook.com/oauth/access_token?";
 	String debugURL = "https://graph.facebook.com/debug_token?";
     
-	String redirectURL = "http%3A%2F%2F1-dot-yvrparks.appspot.com%2Fparkfinder%2Ffacebook%3Fcomment%3D";
+	String redirectURL = "http%3A%2F%2F1-dot-yvrparks.appspot.com%2Fparkfinder%2Ffacebook";  // TODO consider having comment appended
 	String token;
 	String postURL = "https://graph.facebook.com";
 	String appTokenUrl = "https://graph.facebook.com/oauth/access_token?";
 	
 	String access_token = null;
-
+	String comment = null;
+	String parkName = null;
+	public String setStoryData(String comment, String parkName){
+		this.comment = comment;
+		this.parkName = parkName;
+		return "success";
+	}
+	
 	public void doGet(HttpServletRequest req, HttpServletResponse resp) {
         //Do something in here.
 		
-		logger.severe("received get request: " + req.getPathInfo());
+		logger.severe("received get request: ");
 		Enumeration e = req.getParameterNames();
 		
 		while(e.hasMoreElements()){
@@ -46,8 +53,11 @@ public class FacebookServiceImpl extends RemoteServiceServlet  implements Facebo
 		}
 		resp.setStatus(HttpServletResponse.SC_FOUND);
 		String code = req.getParameter("code");
-		String comment = req.getParameter("comment");
-		token = exchangeCode(code, comment);
+		//String comment = req.getParameter("comment");
+		logger.severe(req.getRequestURL().toString());
+		logger.severe("comment = " + comment);
+		token = exchangeCode(code);
+		
 		String userId = debugToken(token, access_token);
 		this.postOnWall(userId, access_token, comment);
 		logger.severe("token = " + token);
@@ -66,12 +76,13 @@ public class FacebookServiceImpl extends RemoteServiceServlet  implements Facebo
 	 * @param comment
 	 * @return
 	 */
-	private String exchangeCode(String code, String comment){
+	private String exchangeCode(String code){
 		String res = null;
 		logger.severe("investigating code");
 		String url = "https://graph.facebook.com/oauth/access_token?";
 		url += "client_id=" + clientId + "&";
-		url += "redirect_uri=" + redirectURL + comment + "&";
+		comment = comment.replace(" ", "++");
+		url += "redirect_uri=" + redirectURL + "&"; // TODO consider having the comment appended to redirect URL?
 		url += "client_secret=" + appSecret + "&";
 		url += "code=" + code;
 		logger.severe("get request follows:");
@@ -98,12 +109,15 @@ public class FacebookServiceImpl extends RemoteServiceServlet  implements Facebo
 		} catch (MalformedURLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			logger.severe("malformed");
 		} catch (ProtocolException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			logger.severe("protocol");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			logger.severe("io exception");
 		}
 		return res;
 	}
@@ -137,6 +151,7 @@ public class FacebookServiceImpl extends RemoteServiceServlet  implements Facebo
 		String url = debugURL;
 		url += "input_token=" + token + "&";
 		url += "access_token=" + accessToken;
+		logger.severe(url);
 		URL obj;
 		try{
 			obj = new URL(url);
@@ -202,7 +217,7 @@ public class FacebookServiceImpl extends RemoteServiceServlet  implements Facebo
 			con.setRequestMethod("POST");
 			con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-			String urlParameters = "message=" + comment + " http://1-dot-yvrparks.appspot.com"
+			String urlParameters = "message=" + "I commented on a park (" + parkName + ") at UBC Park Finder! \n" + comment + " \nhttp://1-dot-yvrparks.appspot.com"
 					+ "&";
 			urlParameters += "access_token=" + accessToken;
 
