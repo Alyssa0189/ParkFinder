@@ -71,6 +71,6 @@ public class ParkOverlay {
 	 * @param id the park's id
 	 */
 	private void displayParkDetails(int id) {
-		this.parkFinder.loadDetailsPanel(id);
+		this.parkFinder.loadDetailsPage(id);
 	}
 }

@@ -53,7 +53,7 @@ public class ParkFinder implements EntryPoint {
 	private Button cancelCommentButton = new Button("Cancel");
 	private Button parkListButton = new Button("View park list");
 	private Button goToDetailPage = new Button("View park details");
-	private Button mapButton = new Button("Back to map");
+	private Button mapButton = new Button("View park map");
 
 	private HashMap<Integer, Park> allParks = new HashMap<Integer, Park>();
 
@@ -176,7 +176,7 @@ public class ParkFinder implements EntryPoint {
 	 * @param id the id of the park to load the details page.
 	 * 
 	 */
-	private void loadDetailsPage(int id) {
+	public void loadDetailsPage(int id) {
 		clearAllDivs();
 		loadDetailsPanel(id);
 	}
@@ -296,7 +296,7 @@ public class ParkFinder implements EntryPoint {
 	 * 
 	 * @param parkId the park's id.
 	 */
-	public void loadDetailsPanel(final int parkId) {
+	private void loadDetailsPanel(final int parkId) {
 		detailsPanel = new VerticalPanel();
 		HorizontalPanel buttonPanel = new HorizontalPanel();
 		addNewRatingButton = new Button("Add/modify your rating");
@@ -664,7 +664,6 @@ public class ParkFinder implements EntryPoint {
 		// Listen for mouse events on the cancel button
 		cancelCommentButton.addClickHandler(new ClickHandler() {
 			public void onClick(ClickEvent event) {
-				RootPanel.get("parkfinder").clear();
 				loadDetailsPage(parkId);
 			}
 		});
@@ -712,7 +711,6 @@ public class ParkFinder implements EntryPoint {
 
 			@Override
 			public void onSuccess(Void ignore) {
-				RootPanel.get("parkfinder").clear();
 				loadDetailsPage(parkId);
 			}
 		});
@@ -996,7 +994,7 @@ public class ParkFinder implements EntryPoint {
 	 * 
 	 */
 	private void addMapViewButton() {
-		mapButton = new Button("Back to map");
+		mapButton = new Button("View park map");
 		RootPanel.get("filterandview").add(mapButton);
 		
 		mapButton.addClickHandler(new ClickHandler() {
