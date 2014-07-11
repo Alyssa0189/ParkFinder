@@ -217,7 +217,7 @@ public class FacebookServiceImpl extends RemoteServiceServlet  implements Facebo
 			con.setRequestMethod("POST");
 			con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-			String urlParameters = "message=" + "I commented on a park (" + parkName + ") at UBC Park Finder! \n" + comment + " \nhttp://1-dot-yvrparks.appspot.com"
+			String urlParameters = "message=" + "I commented on a park (" + parkName + ") at Vancouver Park Finder! \n" + comment + " \nhttp://1-dot-yvrparks.appspot.com"
 					+ "&";
 			urlParameters += "access_token=" + accessToken;
 

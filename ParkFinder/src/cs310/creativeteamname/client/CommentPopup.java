@@ -22,7 +22,7 @@ public class CommentPopup extends DialogBox {
 			@Override
 			public void onClick(ClickEvent event) {
 				//Window.open("https://www.facebook.com/dialog/oauth?client_id=1416292605327006&redirect_uri=http%3A%2F%2F1-dot-yvrparks.appspot.com%2Fparkfinder%2Ffacebook%3Fcomment%3D" + newComment, "_blank", "");
-				Window.open("https://www.facebook.com/dialog/oauth?client_id=1416292605327006&redirect_uri=http%3A%2F%2F1-dot-yvrparks.appspot.com%2Fparkfinder%2Ffacebook", "_blank", "");
+				Window.open("https://www.facebook.com/dialog/oauth?client_id=1416292605327006&scope=publish_actions&redirect_uri=http%3A%2F%2F1-dot-yvrparks.appspot.com%2Fparkfinder%2Ffacebook", "_blank", "");
 				CommentPopup.this.hide();
 			}
 		});
