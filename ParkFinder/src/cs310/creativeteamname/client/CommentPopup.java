@@ -5,10 +5,17 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 
 public class CommentPopup extends DialogBox {
 
 	public CommentPopup() {
+		HorizontalPanel buttonPane = new HorizontalPanel();
+        buttonPane.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
+
+        
+		this.center();
 		Button ok = new Button("YES");
 		this.setText("Upload this comment to facebook?");
 		ok.addClickHandler(new ClickHandler() {
@@ -23,11 +30,14 @@ public class CommentPopup extends DialogBox {
 		no.addClickHandler(new ClickHandler(){
 			@Override
 			public void onClick(ClickEvent event) {
-				//CommentPopup.this.hide();
+				CommentPopup.this.hide();
 			}
 		});
 		//this.add(ok);
 		//this.add(no);
-		setWidget(ok);
+		buttonPane.add(ok);
+        buttonPane.add(no);
+        setWidget(buttonPane);
+		//setWidget(ok);
 	}
 }
