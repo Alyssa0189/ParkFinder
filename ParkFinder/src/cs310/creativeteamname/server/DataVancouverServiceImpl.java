@@ -25,11 +25,12 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import cs310.creativeteamname.client.DataVancouverService;
 import cs310.creativeteamname.shared.Park;
 public class DataVancouverServiceImpl extends RemoteServiceServlet implements DataVancouverService{
-	//private static final String dataSource = "ftp://webftp.vancouver.ca/opendata/xml/parks_facilities.xml";
-	
-	private static final String dataSource = "https://gist.githubusercontent.com/mcracker/9da2bb2e0702b4011a65/raw/0902e816ccb9efa207e59421f3db7749baebbf68/parkXML";
-	private static final String csvSource = "https://gist.githubusercontent.com/mcracker/fa82ca097e6820228ea3/raw/d68a98a78b1ce2bc24851e57012ce3e61115f546/parkImages";
+	// private static final String dataSource = "ftp://webftp.vancouver.ca/opendata/xml/parks_facilities.xml";
+
+	private static final String dataSource = "view-source:ftp://webftp.vancouver.ca/opendata/xml/parks_facilities.xml";
+	private static final String csvSource = "https://gist.githubusercontent.com/djmccool/fa82ca097e6820228ea3/raw/d68a98a78b1ce2bc24851e57012ce3e61115f546/parkImages";
 	private static final String zipSource = "ftp://webftp.vancouver.ca/opendata/csv/csv_parks_facilities.zip";
+
 	private static final String PARK_IMAGES_FILE_NAME = "park_images.csv";
 	private static final Logger logger = Logger.getLogger("logger"); // how many times can you type logger before it looks weird?
 	private static final PersistenceManagerFactory PMF =
